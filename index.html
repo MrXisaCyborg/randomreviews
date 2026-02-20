@@ -223,21 +223,78 @@
   .charts-updated{text-align:center;margin-top:2rem;font-size:.72rem;color:var(--muted);font-family:'Space Mono',monospace}
   .charts-updated span{color:var(--neon-cyan)}
 
-  @media(max-width:900px){
-    .charts-section{padding:3rem 1.5rem}
+  /* REVIEW DETAIL MODAL */
+  .detail-modal{background:var(--surface);border:1px solid var(--border);width:100%;max-width:600px;position:relative;max-height:92vh;overflow-y:auto;animation:fadeUp .3s ease}
+  .detail-img{width:100%;max-height:320px;object-fit:cover;display:block}
+  .detail-body{padding:1.75rem}
+  .detail-header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:.75rem}
+  .detail-title{font-size:1.3rem;font-weight:800;line-height:1.2}
+  .detail-stars{color:var(--neon-yellow);font-size:1rem;letter-spacing:2px;white-space:nowrap}
+  .detail-meta{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem}
+  .detail-author{font-size:.75rem;color:var(--muted);font-family:'Space Mono',monospace}
+  .detail-date{font-size:.75rem;color:var(--muted);font-family:'Space Mono',monospace}
+  .detail-text{font-size:.95rem;color:var(--text);line-height:1.7;margin-bottom:1.25rem}
+  .detail-loc{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;padding:.75rem;background:var(--bg);border:1px solid var(--border);margin-bottom:1rem}
+  .detail-loc-text{font-size:.82rem;color:var(--muted);flex:1}
+  .detail-loc-text::before{content:'📍 '}
+  .detail-maps-btns{display:flex;gap:.5rem;flex-wrap:wrap}
+  .detail-map-btn{display:inline-flex;align-items:center;gap:.4rem;background:transparent;border:1px solid var(--border);color:var(--text);font-size:.75rem;font-family:'Familjen Grotesk',sans-serif;font-weight:700;padding:.4rem .8rem;cursor:pointer;transition:all .2s;text-decoration:none}
+  .detail-map-btn.google:hover{border-color:#4285f4;color:#4285f4}
+  .detail-map-btn.apple:hover{border-color:#f0eee8;color:#f0eee8}
+  .detail-map-btn.waze:hover{border-color:#09d3f5;color:#09d3f5}
+  .detail-agg{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)}
+  .detail-agg-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem}
+
+  /* LOCATION SEARCH */
+  .loc-search-results{background:var(--bg);border:1px solid var(--border);border-top:none;max-height:180px;overflow-y:auto;display:none}
+  .loc-result{padding:.6rem 1rem;font-size:.85rem;cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:.5rem}
+  .loc-result:hover{background:rgba(245,230,66,.06);color:var(--neon-yellow)}
+  .loc-result-icon{flex-shrink:0;font-size:.9rem}
+  .loc-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:.75rem}
+  .loc-tab{background:none;border:none;color:var(--muted);font-family:'Familjen Grotesk',sans-serif;font-weight:700;font-size:.8rem;padding:.5rem .9rem;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+  .loc-tab.active{color:var(--neon-cyan);border-bottom-color:var(--neon-cyan)}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ── MOBILE ─────────────────────────────────────────────────── */
+  @media(max-width:768px){
+    nav{padding:.9rem 1.1rem}
+    .nav-links{display:none}
+    .nav-right{gap:.5rem}
+    #userInfo{display:none}
+    .nav-btn{padding:.45rem .9rem;font-size:.72rem}
+
+    .hero{grid-template-columns:1fr;min-height:auto}
+    .hero-right{display:none}
+    .hero-left{padding:3rem 1.25rem 2.5rem}
+    h1{font-size:clamp(2.2rem,9vw,3rem)}
+
+    .ticker-wrap{padding:1.5rem 0}
+
+    .feed-section{padding:2.5rem 1.25rem}
+    .cat-filter{gap:.5rem}
+    .cat-btn{padding:.38rem .8rem;font-size:.72rem}
+    .reviews-grid{grid-template-columns:1fr}
+
+    .charts-section{padding:2.5rem 1.25rem}
     .charts-header{flex-direction:column;align-items:flex-start}
     .charts-countdown{text-align:left}
-  }
+    .charts-grid{grid-template-columns:1fr}
 
-  @media(max-width:900px){
-    nav{padding:1rem 1.25rem}
-    .nav-links{display:none}
-    .hero{grid-template-columns:1fr}
-    .hero-right{display:none}
-    .hero-left{padding:3.5rem 1.5rem}
-    .feed-section{padding:3rem 1.5rem}
-    .sql-panel{margin:0 1.5rem 1.5rem}
-    footer{flex-direction:column;gap:1rem;text-align:center;padding:1.5rem}
+    .sql-panel{margin:0 1.25rem 1.25rem}
+    footer{flex-direction:column;gap:.75rem;text-align:center;padding:1.5rem 1.25rem}
+
+    .modal{padding:1.5rem;max-height:95vh}
+    .detail-modal{max-height:95vh}
+    .detail-body{padding:1.25rem}
+    .detail-maps-btns{gap:.4rem}
+    .detail-map-btn{font-size:.7rem;padding:.35rem .65rem}
+
+    .loc-attach{flex-direction:column}
+    .loc-detect-btn{width:100%}
+
+    .maps-modal{padding:1.5rem}
+    .agg-big-score{font-size:1.3rem}
   }
 </style>
 </head>
@@ -425,9 +482,19 @@ create policy "Own delete" on reviews for delete using (auth.uid() = user_id);</
     <div class="fg"><label>Title</label><input type="text" id="rTitle" placeholder="e.g. Shawarma cart near Gate 1"></div>
     <div class="fg">
       <label>Location (optional)</label>
-      <div class="loc-attach">
-        <input type="text" id="rLocation" placeholder="e.g. Near Gate 3, Potheri">
-        <button class="loc-detect-btn" onclick="detectLocation()" title="Use my current location">📍 Detect</button>
+      <div class="loc-tabs">
+        <button class="loc-tab active" id="locTabSearch" onclick="switchLocTab('search')">🔍 Search</button>
+        <button class="loc-tab" id="locTabDetect" onclick="switchLocTab('detect')">📍 Use My Location</button>
+      </div>
+      <div id="locSearchPane">
+        <input type="text" id="rLocation" placeholder="Search a place, e.g. Potheri Bus Stand" oninput="searchLocation(this.value)">
+        <div class="loc-search-results" id="locResults"></div>
+      </div>
+      <div id="locDetectPane" style="display:none">
+        <div style="display:flex;gap:.5rem">
+          <input type="text" id="rLocationGps" placeholder="GPS coordinates will appear here" readonly>
+          <button class="loc-detect-btn" onclick="detectLocation()">📍 Detect</button>
+        </div>
       </div>
       <div class="loc-coords" id="locCoords"></div>
     </div>
@@ -453,6 +520,14 @@ create policy "Own delete" on reviews for delete using (auth.uid() = user_id);</
     </div>
     <div class="form-error" id="reviewError"></div>
     <button class="submit-btn" id="submitBtn" onclick="submitReview()">Post Review →</button>
+  </div>
+</div>
+
+<!-- REVIEW DETAIL MODAL -->
+<div class="overlay" id="detailModal">
+  <div class="detail-modal">
+    <button class="modal-close" onclick="closeModal('detailModal')" style="position:absolute;top:1rem;right:1rem;z-index:10;background:rgba(10,10,15,.8);border:1px solid var(--border);color:var(--text);font-size:1.1rem;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer">✕</button>
+    <div id="detailContent"></div>
   </div>
 </div>
 
@@ -635,14 +710,15 @@ function renderReviews(){
     if(r.location_name||r.lat){
       const pinIcon=`<svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`
       const locText=r.location_name?esc(r.location_name):'Location attached'
-      const mapsData=encodeURIComponent(JSON.stringify({name:r.title,loc:r.location_name||'',lat:r.lat||null,lng:r.lng||null}))
+      const d={name:r.title,loc:r.location_name||'',lat:r.lat||null,lng:r.lng||null}
+      const ds=JSON.stringify(d).replace(/"/g,'&quot;')
       locHtml=`<div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:.5rem">
         <div class="r-card-location">${locText}</div>
-        <button class="maps-btn" onclick="openMaps(${mapsData})">${pinIcon} Open in Maps</button>
+        <button class="maps-btn" onclick="openMaps(${ds},event)">${pinIcon} Open in Maps</button>
       </div>`
     }
 
-    return `<div class="r-card ${r.category}">${img}<div class="card-tag ${tagMap[r.category]}">${catLabel[r.category]}</div><div class="r-card-title">${esc(r.title)}</div><div class="r-card-body">${esc(r.body)}</div>${locHtml}${aggHtml}<div class="r-card-meta" style="margin-top:.75rem"><span class="stars">${stars}</span><span class="r-card-author">@${esc(uname)} · ${date}</span></div></div>`
+    return `<div class="r-card ${r.category}" onclick="openDetail('${r.id}')" style="cursor:pointer">${img}<div class="card-tag ${tagMap[r.category]}">${catLabel[r.category]}</div><div class="r-card-title">${esc(r.title)}</div><div class="r-card-body">${esc(r.body)}</div>${locHtml}${aggHtml}<div class="r-card-meta" style="margin-top:.75rem"><span class="stars">${stars}</span><span class="r-card-author">@${esc(uname)} · ${date}</span></div></div>`
   }).join('')
 }
 
@@ -671,7 +747,10 @@ async function submitReview(){
   const title=document.getElementById('rTitle').value.trim()
   const body=document.getElementById('rBody').value.trim()
   const category=document.getElementById('rCategory').value
-  const location=document.getElementById('rLocation').value.trim()
+  const locTab = document.getElementById('locTabDetect').classList.contains('active') ? 'detect' : 'search'
+  const location = locTab==='detect'
+    ? (document.getElementById('rLocationGps').value.trim() || (currentLat ? `${currentLat.toFixed(4)}, ${currentLng.toFixed(4)}` : ''))
+    : document.getElementById('rLocation').value.trim()
   const errEl=document.getElementById('reviewError')
   const btn=document.getElementById('submitBtn')
   errEl.style.display='none'
@@ -865,26 +944,172 @@ function detectLocation(){
 }
 
 // ── OPEN MAPS MODAL ───────────────────────────────────────────
-function openMaps(dataStr){
-  let d
-  try{ d = typeof dataStr==='string' ? JSON.parse(decodeURIComponent(dataStr)) : dataStr }
-  catch(e){ d={name:'Location',loc:'',lat:null,lng:null} }
+function openMaps(d, ev){
+  if(ev) ev.stopPropagation()
+  if(typeof d==='string') try{d=JSON.parse(d)}catch(e){d={}}
 
-  const query = d.lat&&d.lng ? `${d.lat},${d.lng}` : encodeURIComponent((d.loc||d.name||'SRM Institute Kattankulathur'))
-  const label = encodeURIComponent(d.name||d.loc||'Review Location')
+  const locStr = d.loc||d.name||''
+  const hasCoords = d.lat && d.lng
 
-  document.getElementById('mapsModalDesc').textContent = d.loc||d.name||'Open in your preferred maps app'
-  document.getElementById('gmapsLink').href = d.lat&&d.lng
-    ? `https://www.google.com/maps?q=${d.lat},${d.lng}&query=${label}`
-    : `https://www.google.com/maps/search/${encodeURIComponent(d.loc||d.name)}`
-  document.getElementById('applemapsLink').href = d.lat&&d.lng
-    ? `https://maps.apple.com/?ll=${d.lat},${d.lng}&q=${label}`
-    : `https://maps.apple.com/?q=${encodeURIComponent(d.loc||d.name)}`
-  document.getElementById('wazeLink').href = d.lat&&d.lng
-    ? `https://waze.com/ul?ll=${d.lat},${d.lng}&navigate=yes`
-    : `https://waze.com/ul?q=${encodeURIComponent(d.loc||d.name)}&navigate=yes`
+  document.getElementById('mapsModalDesc').textContent = locStr || 'Open in your preferred maps app'
+
+  if(hasCoords){
+    const lat=d.lat, lng=d.lng, q=encodeURIComponent(d.name||locStr)
+    document.getElementById('gmapsLink').href = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
+    document.getElementById('applemapsLink').href = `https://maps.apple.com/?ll=${lat},${lng}&q=${q}`
+    document.getElementById('wazeLink').href = `https://waze.com/ul?ll=${lat},${lng}&navigate=yes`
+  } else {
+    const q = encodeURIComponent(locStr||'SRM Institute Kattankulathur')
+    document.getElementById('gmapsLink').href = `https://www.google.com/maps/search/?api=1&query=${q}`
+    document.getElementById('applemapsLink').href = `https://maps.apple.com/?q=${q}`
+    document.getElementById('wazeLink').href = `https://waze.com/ul?q=${q}&navigate=yes`
+  }
 
   document.getElementById('mapsModal').classList.add('open')
+}
+
+// ── OPEN REVIEW DETAIL ────────────────────────────────────────
+function openDetail(reviewId){
+  const r = allReviews.find(x=>x.id===reviewId)
+  if(!r) return
+
+  const stars='★'.repeat(r.rating)+'☆'.repeat(5-r.rating)
+  const date=new Date(r.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})
+  const uname=r.username||'anon'
+  const tagMap={food:'tag-food',spot:'tag-spot',flat:'tag-flat',travel:'tag-travel'}
+  const catLabel={food:'🍜 Food',spot:'🗺️ Spot',flat:'🏠 Flat',travel:'🚌 Travel'}
+
+  // Aggregate
+  const agg={}
+  allReviews.filter(x=>x.title.trim().toLowerCase()===r.title.trim().toLowerCase()).forEach(x=>{
+    agg.total=(agg.total||0)+x.rating
+    agg.count=(agg.count||0)+1
+    agg.dist=agg.dist||{5:0,4:0,3:0,2:0,1:0}
+    agg.dist[x.rating]=(agg.dist[x.rating]||0)+1
+  })
+
+  const imgHtml = r.image_url ? `<img class="detail-img" src="${r.image_url}" alt="photo">` : ''
+
+  let locHtml = ''
+  if(r.location_name||r.lat){
+    const d={name:r.title,loc:r.location_name||'',lat:r.lat||null,lng:r.lng||null}
+    const ds=JSON.stringify(d).replace(/"/g,'&quot;')
+    locHtml=`<div class="detail-loc">
+      <div class="detail-loc-text">${esc(r.location_name||'GPS Location')}</div>
+      <div class="detail-maps-btns">
+        <button class="detail-map-btn google" onclick="openMaps(${ds},event)">🗺️ Google</button>
+        <button class="detail-map-btn apple" onclick="openMaps(${ds},event)">🍎 Apple</button>
+        <button class="detail-map-btn waze" onclick="openMaps(${ds},event)">🚗 Waze</button>
+      </div>
+    </div>`
+  }
+
+  let aggHtml = ''
+  if(agg.count>=2){
+    const avg=(agg.total/agg.count).toFixed(1)
+    const bars=[5,4,3,2,1].map(n=>{
+      const pct=Math.round((agg.dist[n]||0)/agg.count*100)
+      return `<div class="bar-row"><span class="bar-label">${n}</span><div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div><span class="bar-num">${agg.dist[n]||0}</span></div>`
+    }).join('')
+    aggHtml=`<div class="detail-agg">
+      <div class="detail-agg-title">Overall Rating (${agg.count} reviews)</div>
+      <div class="agg-summary"><div class="agg-big-score">${avg}</div><div class="agg-right"><div class="agg-stars-row">${'★'.repeat(Math.round(agg.total/agg.count))}${'☆'.repeat(5-Math.round(agg.total/agg.count))}</div><div class="agg-count">${agg.count} total reviews</div></div></div>
+      ${bars}
+    </div>`
+  }
+
+  document.getElementById('detailContent').innerHTML = `
+    ${imgHtml}
+    <div class="detail-body">
+      <div class="card-tag ${tagMap[r.category]}" style="margin-bottom:.75rem">${catLabel[r.category]}</div>
+      <div class="detail-header">
+        <div class="detail-title">${esc(r.title)}</div>
+        <div class="detail-stars">${stars}</div>
+      </div>
+      <div class="detail-meta">
+        <span class="detail-author">@${esc(uname)}</span>
+        <span class="detail-date">${date}</span>
+      </div>
+      <div class="detail-text">${esc(r.body)}</div>
+      ${locHtml}
+      ${aggHtml}
+    </div>`
+
+  document.getElementById('detailModal').classList.add('open')
+}
+
+// ── LOCATION SEARCH (Nominatim / OpenStreetMap - free) ────────
+let locSearchTimer = null
+async function searchLocation(query){
+  const resultsEl = document.getElementById('locResults')
+  if(!query||query.length<3){ resultsEl.style.display='none'; return }
+  clearTimeout(locSearchTimer)
+  locSearchTimer = setTimeout(async()=>{
+    try{
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query+' Kattankulathur Tamil Nadu')}&format=json&limit=5&addressdetails=1`)
+      const data = await res.json()
+      if(!data.length){
+        resultsEl.innerHTML='<div class="loc-result" style="color:var(--muted)">No results found</div>'
+        resultsEl.style.display='block'
+        return
+      }
+      resultsEl.innerHTML = data.map(p=>`
+        <div class="loc-result" onclick="selectLocation('${esc(p.display_name)}',${p.lat},${p.lon})">
+          <span class="loc-result-icon">📍</span>
+          <span>${esc(p.display_name.split(',').slice(0,3).join(', '))}</span>
+        </div>`).join('')
+      resultsEl.style.display='block'
+    }catch(e){ resultsEl.style.display='none' }
+  }, 400)
+}
+
+function selectLocation(name, lat, lng){
+  document.getElementById('rLocation').value = name.split(',').slice(0,2).join(', ')
+  currentLat = parseFloat(lat)
+  currentLng = parseFloat(lng)
+  document.getElementById('locResults').style.display='none'
+  const coordsEl=document.getElementById('locCoords')
+  coordsEl.textContent=`${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`
+  coordsEl.style.display='block'
+  showToast('Location selected! 📍','success')
+}
+
+function switchLocTab(tab){
+  document.getElementById('locTabSearch').classList.toggle('active',tab==='search')
+  document.getElementById('locTabDetect').classList.toggle('active',tab==='detect')
+  document.getElementById('locSearchPane').style.display=tab==='search'?'block':'none'
+  document.getElementById('locDetectPane').style.display=tab==='detect'?'block':'none'
+  // clear coords when switching
+  currentLat=null; currentLng=null
+  document.getElementById('locCoords').style.display='none'
+}
+// ── LOCATION DETECT ───────────────────────────────────────────
+function detectLocation(){
+  const btn=document.querySelector('.loc-detect-btn')
+  const coordsEl=document.getElementById('locCoords')
+  if(!navigator.geolocation){showToast('Geolocation not supported on this browser','error');return}
+  btn.textContent='Detecting...'
+  btn.disabled=true
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      currentLat=pos.coords.latitude
+      currentLng=pos.coords.longitude
+      btn.textContent='✅ Got it!'
+      btn.disabled=false
+      const gpsInput=document.getElementById('rLocationGps')
+      if(gpsInput) gpsInput.value=`${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`
+      coordsEl.textContent=`${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`
+      coordsEl.style.display='block'
+      showToast('Location detected! 📍','success')
+    },
+    err=>{
+      btn.textContent='📍 Detect'
+      btn.disabled=false
+      const msgs={1:'Location permission denied — allow in browser settings',2:'Position unavailable',3:'Request timed out'}
+      showToast(msgs[err.code]||'Could not get location','error')
+    },
+    {timeout:10000,enableHighAccuracy:true}
+  )
 }
 function setRating(val){
   currentRating=val
@@ -912,11 +1137,15 @@ function resetForm(){
   document.getElementById('rTitle').value=''
   document.getElementById('rBody').value=''
   document.getElementById('rLocation').value=''
+  if(document.getElementById('rLocationGps')) document.getElementById('rLocationGps').value=''
   document.getElementById('photoInput').value=''
   document.getElementById('imgPreview').style.display='none'
   document.getElementById('locCoords').style.display='none'
   document.getElementById('locCoords').textContent=''
-  document.querySelector('.loc-detect-btn').textContent='📍 Detect'
+  document.getElementById('locResults').style.display='none'
+  const detectBtn=document.querySelector('.loc-detect-btn')
+  if(detectBtn) detectBtn.textContent='📍 Detect'
+  switchLocTab('search')
   currentRating=0
   currentLat=null
   currentLng=null
