@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,41 +32,6 @@
   .nav-btn.ghost:hover{border-color:var(--neon-cyan);color:var(--neon-cyan);background:transparent}
   .nav-btn.danger{background:transparent;color:var(--neon-pink);border:1px solid rgba(255,61,139,.3);clip-path:none}
   .nav-btn.danger:hover{background:rgba(255,61,139,.1)}
-
-  /* HAMBURGER */
-  .hamburger{display:none;flex-direction:column;justify-content:center;align-items:center;gap:5px;width:40px;height:40px;background:transparent;border:1px solid var(--border);cursor:pointer;padding:0;transition:border-color .2s;flex-shrink:0}
-  .hamburger:hover{border-color:var(--neon-yellow)}
-  .hamburger span{display:block;width:18px;height:2px;background:var(--text);transition:all .3s ease;transform-origin:center}
-  .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);background:var(--neon-yellow)}
-  .hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0)}
-  .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);background:var(--neon-yellow)}
-
-  /* MOBILE DRAWER */
-  .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:490;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(4px)}
-  .drawer-overlay.open{opacity:1;pointer-events:all}
-  .drawer{position:fixed;top:0;right:0;bottom:0;width:min(300px,85vw);background:var(--surface);border-left:1px solid var(--border);z-index:495;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow-y:auto}
-  .drawer.open{transform:translateX(0)}
-  .drawer-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-  .drawer-logo{font-family:'Permanent Marker',cursive;font-size:1.2rem;color:var(--neon-yellow)}
-  .drawer-logo span{color:var(--neon-pink)}
-  .drawer-close{background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;padding:.25rem;transition:color .2s}
-  .drawer-close:hover{color:var(--neon-pink)}
-  .drawer-user{padding:1rem 1.5rem;border-bottom:1px solid var(--border);background:rgba(245,230,66,.04)}
-  .drawer-user-info{font-family:'Space Mono',monospace;font-size:.8rem;color:var(--neon-yellow);margin-bottom:.75rem}
-  .drawer-user-info.hidden{display:none}
-  .drawer-nav{padding:.75rem 0;flex:1}
-  .drawer-nav a{display:flex;align-items:center;gap:.85rem;padding:.9rem 1.5rem;color:var(--muted);text-decoration:none;font-weight:700;font-size:.95rem;letter-spacing:.03em;transition:all .2s;border-left:3px solid transparent}
-  .drawer-nav a:hover,.drawer-nav a.active{color:var(--text);background:rgba(245,230,66,.06);border-left-color:var(--neon-yellow)}
-  .drawer-nav a .nav-icon{font-size:1.1rem;width:22px;text-align:center}
-  .drawer-divider{height:1px;background:var(--border);margin:.5rem 1.5rem}
-  .drawer-actions{padding:1.25rem 1.5rem;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:.65rem}
-  .drawer-btn{width:100%;padding:.85rem;font-family:'Familjen Grotesk',sans-serif;font-weight:800;font-size:.9rem;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;transition:all .2s;border:none;text-align:center}
-  .drawer-btn.primary{background:var(--neon-yellow);color:#0a0a0f;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
-  .drawer-btn.primary:hover{background:var(--neon-pink);color:#fff}
-  .drawer-btn.secondary{background:transparent;color:var(--text);border:1px solid var(--border)}
-  .drawer-btn.secondary:hover{border-color:var(--neon-cyan);color:var(--neon-cyan)}
-  .drawer-btn.del{background:transparent;color:var(--neon-pink);border:1px solid rgba(255,61,139,.3)}
-  .drawer-btn.del:hover{background:rgba(255,61,139,.1)}
 
   /* MOBILE BOTTOM FAB */
   .fab{display:none;position:fixed;bottom:1.5rem;right:1.5rem;z-index:400;background:var(--neon-yellow);color:#0a0a0f;border:none;width:56px;height:56px;font-size:1.5rem;cursor:pointer;box-shadow:0 8px 24px rgba(245,230,66,.3);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));transition:all .2s}
@@ -298,42 +262,72 @@
 
   /* ── MOBILE ─────────────────────────────────────────────────── */
   @media(max-width:768px){
-    nav{padding:.9rem 1.1rem}
+    /* NAV */
+    nav{padding:.85rem 1.1rem}
     .nav-links{display:none}
-    .nav-right{gap:.5rem}
+    .nav-right{display:none}
     #userInfo{display:none}
-    .nav-btn{padding:.45rem .9rem;font-size:.72rem}
+    .hamburger{display:flex}
+    .fab{display:flex;align-items:center;justify-content:center}
 
+    /* HERO */
     .hero{grid-template-columns:1fr;min-height:auto}
     .hero-right{display:none}
-    .hero-left{padding:3rem 1.25rem 2.5rem}
-    h1{font-size:clamp(2.2rem,9vw,3rem)}
+    .hero-left{padding:2.5rem 1.25rem 2rem}
+    h1{font-size:clamp(2rem,10vw,2.8rem)}
+    .hero-desc{font-size:.9rem}
+    .hero-actions{gap:.75rem}
+    .btn-pri,.btn-ghost-hero{padding:.75rem 1.4rem;font-size:.88rem;width:100%}
+    .hero-stats{gap:1.5rem;margin-top:2rem}
+    .stat-num{font-size:1.3rem}
 
-    .ticker-wrap{padding:1.5rem 0}
+    /* TICKER */
+    .ticker-wrap{padding:1.25rem 0}
 
-    .feed-section{padding:2.5rem 1.25rem}
-    .cat-filter{gap:.5rem}
-    .cat-btn{padding:.38rem .8rem;font-size:.72rem}
-    .reviews-grid{grid-template-columns:1fr}
+    /* FEED */
+    .feed-section{padding:2rem 1.1rem}
+    .section-title{font-size:1.4rem}
+    .cat-filter{gap:.4rem;flex-wrap:wrap}
+    .cat-btn{padding:.35rem .75rem;font-size:.7rem}
+    .reviews-grid{grid-template-columns:1fr;gap:1rem}
+    .r-card{padding:1.1rem}
+    .r-card-title{font-size:.95rem}
 
-    .charts-section{padding:2.5rem 1.25rem}
-    .charts-header{flex-direction:column;align-items:flex-start}
-    .charts-countdown{text-align:left}
-    .charts-grid{grid-template-columns:1fr}
+    /* CHARTS */
+    .charts-section{padding:2rem 1.1rem}
+    .charts-header{flex-direction:column;align-items:flex-start;gap:.75rem}
+    .charts-countdown{text-align:left;font-size:.7rem}
+    .charts-grid{grid-template-columns:1fr;gap:1rem}
+    .chart-card{padding:1.1rem}
 
-    .sql-panel{margin:0 1.25rem 1.25rem}
-    footer{flex-direction:column;gap:.75rem;text-align:center;padding:1.5rem 1.25rem}
+    /* SQL */
+    .sql-panel{margin:0 1.1rem 1.1rem}
+    .sql-panel pre{font-size:.65rem}
 
-    .modal{padding:1.5rem;max-height:95vh}
-    .detail-modal{max-height:95vh}
-    .detail-body{padding:1.25rem}
-    .detail-maps-btns{gap:.4rem}
-    .detail-map-btn{font-size:.7rem;padding:.35rem .65rem}
+    /* FOOTER */
+    footer{flex-direction:column;gap:.75rem;text-align:center;padding:1.5rem 1.1rem}
 
+    /* MODALS — full screen on mobile */
+    .overlay{padding:0;align-items:flex-end}
+    .modal{padding:1.5rem 1.25rem;max-height:92vh;border-radius:0;border-bottom:none;border-left:none;border-right:none;border-top:2px solid var(--neon-yellow);max-width:100%}
+    .modal h2{font-size:1.25rem}
+    .detail-modal{max-height:94vh;border-radius:0;max-width:100%}
+    .detail-body{padding:1.1rem}
+    .detail-title{font-size:1.1rem}
+    .detail-maps-btns{gap:.35rem;flex-wrap:wrap}
+    .detail-map-btn{font-size:.7rem;padding:.35rem .6rem}
+
+    /* MAPS MODAL */
+    .maps-modal{padding:1.5rem;max-width:100%;border-radius:0;border-left:none;border-right:none;border-bottom:none;border-top:2px solid var(--neon-cyan)}
+    .map-option{padding:.85rem 1rem}
+
+    /* LOCATION */
     .loc-attach{flex-direction:column}
     .loc-detect-btn{width:100%}
+    .loc-tabs{gap:0}
+    .loc-tab{flex:1;text-align:center;font-size:.75rem}
 
-    .maps-modal{padding:1.5rem}
+    /* AGGREGATE */
     .agg-big-score{font-size:1.3rem}
   }
 </style>
@@ -440,11 +434,11 @@ create policy "Own delete" on reviews for delete using (auth.uid() = user_id);</
   <div class="section-label">Browse reviews</div>
   <h2 class="section-title">What's everyone saying?</h2>
   <div class="cat-filter">
-    <button class="cat-btn active" onclick="filterCat('all',this)">🔥 All</button>
-    <button class="cat-btn" onclick="filterCat('food',this)">🍜 Food</button>
-    <button class="cat-btn" onclick="filterCat('spot',this)">🗺️ Spots</button>
-    <button class="cat-btn" onclick="filterCat('flat',this)">🏠 Flats</button>
-    <button class="cat-btn" onclick="filterCat('travel',this)">🚌 Travel</button>
+    <button class="cat-btn active" data-cat="all" onclick="filterCat('all',this)">🔥 All</button>
+    <button class="cat-btn" data-cat="food" onclick="filterCat('food',this)">🍜 Food</button>
+    <button class="cat-btn" data-cat="spot" onclick="filterCat('spot',this)">🗺️ Spots</button>
+    <button class="cat-btn" data-cat="flat" onclick="filterCat('flat',this)">🏠 Flats</button>
+    <button class="cat-btn" data-cat="travel" onclick="filterCat('travel',this)">🚌 Travel</button>
   </div>
   <div id="reviewsGrid" class="reviews-grid">
     <div class="state-box">Loading reviews...</div>
@@ -656,15 +650,26 @@ async function doLogin(){
 async function doSignup(){
   const email=document.getElementById('signupEmail').value.trim()
   const pass=document.getElementById('signupPassword').value
-  const username=document.getElementById('signupUsername').value.trim()
+  const username=document.getElementById('signupUsername').value.trim().replace('@','')
   const errEl=document.getElementById('signupError')
   const sucEl=document.getElementById('signupSuccess')
   const btn=document.getElementById('signupBtn2')
   errEl.style.display='none';sucEl.style.display='none'
   if(!email||!pass||!username){showErr(errEl,'Fill in all fields');return}
   if(pass.length<6){showErr(errEl,'Password needs at least 6 characters');return}
-  btn.disabled=true;btn.textContent='Creating account...'
-  const {error}=await db.auth.signUp({email,password:pass,options:{data:{username:username.replace('@','')}}})
+  if(!/^[a-zA-Z0-9_]+$/.test(username)){showErr(errEl,'Username can only contain letters, numbers and underscores');return}
+
+  // Check username uniqueness against existing reviews
+  btn.disabled=true;btn.textContent='Checking username...'
+  const {data:existing}=await db.from('reviews').select('username').eq('username',username).limit(1)
+  if(existing&&existing.length>0){
+    showErr(errEl,'Username @'+username+' is already taken — pick another one')
+    btn.disabled=false;btn.textContent='Create Account →'
+    return
+  }
+
+  btn.textContent='Creating account...'
+  const {error}=await db.auth.signUp({email,password:pass,options:{data:{username}}})
   btn.disabled=false;btn.textContent='Create Account →'
   if(error) showErr(errEl,error.message)
   else{sucEl.style.display='block';showToast('Check your email to confirm! 📬','success')}
@@ -675,7 +680,8 @@ async function doLogout(){
   showToast('Logged out. See you! 👋','success')
 }
 
-// ── REVIEWS ───────────────────────────────────────────────────
+
+
 async function loadReviews(){
   document.getElementById('reviewsGrid').innerHTML='<div class="state-box">Loading reviews...</div>'
   try{
