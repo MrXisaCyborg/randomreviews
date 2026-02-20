@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,11 +19,11 @@
   body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;opacity:.4}
 
   /* NAV */
-  nav{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 3rem;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:500;background:rgba(10,10,15,.9);backdrop-filter:blur(20px)}
-  .logo{font-family:'Permanent Marker',cursive;font-size:1.4rem;color:var(--neon-yellow);text-shadow:0 0 20px rgba(245,230,66,.4)}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 3rem;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:500;background:rgba(10,10,15,.95);backdrop-filter:blur(20px)}
+  .logo{font-family:'Permanent Marker',cursive;font-size:1.4rem;color:var(--neon-yellow);text-shadow:0 0 20px rgba(245,230,66,.4);text-decoration:none}
   .logo span{color:var(--neon-pink)}
   .nav-links{display:flex;gap:2rem;list-style:none}
-  .nav-links a{color:var(--muted);text-decoration:none;font-weight:600;font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;transition:color .2s;}
+  .nav-links a{color:var(--muted);text-decoration:none;font-weight:600;font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;transition:color .2s}
   .nav-links a:hover,.nav-links a.active{color:var(--neon-yellow)}
   .nav-right{display:flex;gap:.75rem;align-items:center}
   #userInfo{font-size:.75rem;color:var(--muted);font-family:'Space Mono',monospace}
@@ -32,6 +33,45 @@
   .nav-btn.ghost:hover{border-color:var(--neon-cyan);color:var(--neon-cyan);background:transparent}
   .nav-btn.danger{background:transparent;color:var(--neon-pink);border:1px solid rgba(255,61,139,.3);clip-path:none}
   .nav-btn.danger:hover{background:rgba(255,61,139,.1)}
+
+  /* HAMBURGER */
+  .hamburger{display:none;flex-direction:column;justify-content:center;align-items:center;gap:5px;width:40px;height:40px;background:transparent;border:1px solid var(--border);cursor:pointer;padding:0;transition:border-color .2s;flex-shrink:0}
+  .hamburger:hover{border-color:var(--neon-yellow)}
+  .hamburger span{display:block;width:18px;height:2px;background:var(--text);transition:all .3s ease;transform-origin:center}
+  .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);background:var(--neon-yellow)}
+  .hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+  .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);background:var(--neon-yellow)}
+
+  /* MOBILE DRAWER */
+  .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:490;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(4px)}
+  .drawer-overlay.open{opacity:1;pointer-events:all}
+  .drawer{position:fixed;top:0;right:0;bottom:0;width:min(300px,85vw);background:var(--surface);border-left:1px solid var(--border);z-index:495;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow-y:auto}
+  .drawer.open{transform:translateX(0)}
+  .drawer-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .drawer-logo{font-family:'Permanent Marker',cursive;font-size:1.2rem;color:var(--neon-yellow)}
+  .drawer-logo span{color:var(--neon-pink)}
+  .drawer-close{background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;padding:.25rem;transition:color .2s}
+  .drawer-close:hover{color:var(--neon-pink)}
+  .drawer-user{padding:1rem 1.5rem;border-bottom:1px solid var(--border);background:rgba(245,230,66,.04)}
+  .drawer-user-info{font-family:'Space Mono',monospace;font-size:.8rem;color:var(--neon-yellow);margin-bottom:.75rem}
+  .drawer-user-info.hidden{display:none}
+  .drawer-nav{padding:.75rem 0;flex:1}
+  .drawer-nav a{display:flex;align-items:center;gap:.85rem;padding:.9rem 1.5rem;color:var(--muted);text-decoration:none;font-weight:700;font-size:.95rem;letter-spacing:.03em;transition:all .2s;border-left:3px solid transparent}
+  .drawer-nav a:hover,.drawer-nav a.active{color:var(--text);background:rgba(245,230,66,.06);border-left-color:var(--neon-yellow)}
+  .drawer-nav a .nav-icon{font-size:1.1rem;width:22px;text-align:center}
+  .drawer-divider{height:1px;background:var(--border);margin:.5rem 1.5rem}
+  .drawer-actions{padding:1.25rem 1.5rem;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:.65rem}
+  .drawer-btn{width:100%;padding:.85rem;font-family:'Familjen Grotesk',sans-serif;font-weight:800;font-size:.9rem;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;transition:all .2s;border:none;text-align:center}
+  .drawer-btn.primary{background:var(--neon-yellow);color:#0a0a0f;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+  .drawer-btn.primary:hover{background:var(--neon-pink);color:#fff}
+  .drawer-btn.secondary{background:transparent;color:var(--text);border:1px solid var(--border)}
+  .drawer-btn.secondary:hover{border-color:var(--neon-cyan);color:var(--neon-cyan)}
+  .drawer-btn.del{background:transparent;color:var(--neon-pink);border:1px solid rgba(255,61,139,.3)}
+  .drawer-btn.del:hover{background:rgba(255,61,139,.1)}
+
+  /* MOBILE BOTTOM FAB */
+  .fab{display:none;position:fixed;bottom:1.5rem;right:1.5rem;z-index:400;background:var(--neon-yellow);color:#0a0a0f;border:none;width:56px;height:56px;font-size:1.5rem;cursor:pointer;box-shadow:0 8px 24px rgba(245,230,66,.3);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));transition:all .2s}
+  .fab:hover{background:var(--neon-pink);box-shadow:0 8px 24px rgba(255,61,139,.3)}
 
   /* HERO */
   .hero{min-height:90vh;display:grid;grid-template-columns:1fr 1fr;position:relative;overflow:hidden}
@@ -1018,6 +1058,17 @@ function openDetail(reviewId){
     </div>`
   }
 
+  // Show delete button only if this review belongs to current user
+  const isOwner = currentUser && currentUser.id === r.user_id
+  const deleteHtml = isOwner ? `
+    <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border)">
+      <button id="deleteBtn_${r.id}" onclick="confirmDelete('${r.id}')"
+        style="background:transparent;border:1px solid rgba(255,61,139,.35);color:var(--neon-pink);font-family:'Familjen Grotesk',sans-serif;font-weight:700;font-size:.85rem;padding:.6rem 1.2rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.5rem"
+        onmouseover="this.style.background='rgba(255,61,139,.1)'" onmouseout="this.style.background='transparent'">
+        🗑️ Delete my review
+      </button>
+    </div>` : ''
+
   document.getElementById('detailContent').innerHTML = `
     ${imgHtml}
     <div class="detail-body">
@@ -1033,6 +1084,7 @@ function openDetail(reviewId){
       <div class="detail-text">${esc(r.body)}</div>
       ${locHtml}
       ${aggHtml}
+      ${deleteHtml}
     </div>`
 
   document.getElementById('detailModal').classList.add('open')
@@ -1111,6 +1163,42 @@ function detectLocation(){
     {timeout:10000,enableHighAccuracy:true}
   )
 }
+// ── DELETE REVIEW ─────────────────────────────────────────────
+function confirmDelete(reviewId){
+  const btn = document.getElementById(`deleteBtn_${reviewId}`)
+  if(!btn) return
+  if(btn.dataset.confirming !== 'true'){
+    btn.dataset.confirming = 'true'
+    btn.innerHTML = '⚠️ Tap again to confirm'
+    btn.style.borderColor = 'var(--neon-yellow)'
+    btn.style.color = 'var(--neon-yellow)'
+    setTimeout(()=>{
+      if(btn.dataset.confirming==='true'){
+        btn.dataset.confirming='false'
+        btn.innerHTML='🗑️ Delete my review'
+        btn.style.borderColor='rgba(255,61,139,.35)'
+        btn.style.color='var(--neon-pink)'
+      }
+    }, 3000)
+    return
+  }
+  deleteReview(reviewId)
+}
+
+async function deleteReview(reviewId){
+  const btn = document.getElementById(`deleteBtn_${reviewId}`)
+  if(btn){ btn.disabled=true; btn.innerHTML='Deleting...' }
+  const {error} = await db.from('reviews').delete().eq('id', reviewId).eq('user_id', currentUser.id)
+  if(error){
+    showToast('Delete failed: ' + error.message, 'error')
+    if(btn){ btn.disabled=false; btn.innerHTML='🗑️ Delete my review'; btn.dataset.confirming='false' }
+  } else {
+    showToast('Review deleted 🗑️', 'success')
+    closeModal('detailModal')
+    await loadReviews()
+  }
+}
+
 function setRating(val){
   currentRating=val
   document.querySelectorAll('.star-btn').forEach((b,i)=>b.classList.toggle('active',i<val))
