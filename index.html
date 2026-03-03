@@ -138,7 +138,7 @@
   .fg input,.fg textarea,.fg select{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:.75rem 1rem;font-family:'Familjen Grotesk',sans-serif;font-size:.9rem;transition:border-color .2s;cursor:text}
   .fg input:focus,.fg textarea:focus,.fg select:focus{outline:none;border-color:var(--neon-yellow)}
   .fg textarea{resize:vertical;min-height:100px}
-  .fg select{cursor:pointer;option background:var(--surface)}
+  .fg select{cursor:pointer}
   .star-rating{display:flex;gap:.5rem}
   .star-btn{background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--muted);transition:color .15s,transform .15s}
   .star-btn:hover,.star-btn.active{color:var(--neon-yellow);transform:scale(1.2)}
@@ -809,6 +809,7 @@ async function submitReview(){
   let imageUrl=null
   const file=document.getElementById('photoInput').files[0]
   if(file){
+    if(file.size>5*1024*1024){showErr(errEl,'Photo must be under 5MB');btn.disabled=false;btn.textContent='Post Review →';return}
     const ext=file.name.split('.').pop()
     const fname=`${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
     const {error:upErr}=await db.storage.from('review-images').upload(fname,file)
@@ -929,7 +930,7 @@ function updateCountdown(){
   nextSun.setUTCHours(11,30,0,0) // 5pm IST
 
   // If today is Sunday but before 5pm, use today
-  if(nowIST.getUTCDay()===0&&nowIST.getUTCHours()<11||(nowIST.getUTCHours()===11&&nowIST.getUTCMinutes()<30)){
+  if(nowIST.getUTCDay()===0&&(nowIST.getUTCHours()<11||(nowIST.getUTCHours()===11&&nowIST.getUTCMinutes()<30))){
     nextSun.setUTCDate(nowIST.getUTCDate())
   }
 
@@ -957,36 +958,6 @@ function filterCat(cat,el){
   document.querySelectorAll('.cat-btn,.nav-links a').forEach(b=>b.classList.remove('active'))
   if(el) el.classList.add('active')
   renderReviews()
-}
-
-// ── LOCATION DETECT ───────────────────────────────────────────
-function detectLocation(){
-  const btn=document.querySelector('.loc-detect-btn')
-  const coordsEl=document.getElementById('locCoords')
-  if(!navigator.geolocation){showToast('Geolocation not supported on this browser','error');return}
-  btn.textContent='Detecting...'
-  btn.disabled=true
-  navigator.geolocation.getCurrentPosition(
-    pos=>{
-      currentLat=pos.coords.latitude
-      currentLng=pos.coords.longitude
-      btn.textContent='✅ Got it!'
-      btn.disabled=false
-      coordsEl.textContent=`${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`
-      coordsEl.style.display='block'
-      // Pre-fill location text if empty
-      const locInput=document.getElementById('rLocation')
-      if(!locInput.value) locInput.value='Location attached (GPS)'
-      showToast('Location detected! 📍','success')
-    },
-    err=>{
-      btn.textContent='📍 Detect'
-      btn.disabled=false
-      const msgs={1:'Location permission denied',2:'Position unavailable',3:'Request timed out'}
-      showToast(msgs[err.code]||'Could not get location','error')
-    },
-    {timeout:10000,enableHighAccuracy:true}
-  )
 }
 
 // ── OPEN MAPS MODAL ───────────────────────────────────────────
@@ -1251,7 +1222,7 @@ function showToast(msg,type){
   setTimeout(()=>t.classList.remove('show'),3500)
 }
 function showErr(el,msg){el.textContent=msg;el.style.display='block'}
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
 
 // close modals on bg click
 document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}))
