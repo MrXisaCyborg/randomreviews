@@ -6,7 +6,144 @@
 <title>Random Reviews — SRM's Unfiltered Guide</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0a0f'/%3E%3Crect width='64' height='64' rx='14' fill='%23f5e642' opacity='0.12'/%3E%3Ctext x='50%25' y='54%25' font-size='38' text-anchor='middle' dominant-baseline='middle' font-family='serif'%3E⭐%3C/text%3E%3Ctext x='50%25' y='88%25' font-size='10' text-anchor='middle' font-family='monospace' fill='%23f5e642' font-weight='bold'%3ERR%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous">
+// ── SORTING ───────────────────────────────────────────────────
+function handleSortChange(){
+  currentSort = document.getElementById('sortSelect').value;
+  renderReviews();
+}
+
+// ── PROFILE ───────────────────────────────────────────────────
+function openProfile(){
+  if(!currentUser) return;
+  document.getElementById('profileEmail').textContent = currentUser.email;
+  document.getElementById('profileModal').classList.add('open');
+  renderProfileReviews();
+}
+
+function renderProfileReviews(){
+  const container = document.getElementById('profileReviewsContainer');
+  const userReviews = allReviews.filter(r => r.user_id === currentUser.id);
+  const sortVal = document.getElementById('profileSortSelect').value;
+  
+  userReviews.sort((a,b)=>{
+    if(sortVal==='newest') return new Date(b.created_at) - new Date(a.created_at);
+    if(sortVal==='oldest') return new Date(a.created_at) - new Date(b.created_at);
+    if(sortVal==='highest') return b.rating - a.rating;
+    if(sortVal==='lowest') return a.rating - b.rating;
+  });
+
+  if(!userReviews.length){
+    container.innerHTML = '<div class="empty-state" style="padding:2rem 1rem"><p>You haven\'t dropped any reviews yet.</p></div>';
+    return;
+  }
+  
+  container.innerHTML = userReviews.map(r => {
+    const stars = '★'.repeat(r.rating) + '☆'.repeat(5-r.rating);
+    const date = new Date(r.created_at).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'});
+    const imgHtml = r.image_url ? '<img class="profile-review-img" src="' + esc(r.image_url) + '" alt="img">' : '';
+    
+    return '<div class="profile-review-item" id="profRev_' + r.id + '">' +
+        imgHtml +
+        '<div class="profile-review-content">' +
+          '<div class="profile-review-title">' + esc(r.title) + '</div>' +
+          '<div class="profile-review-meta">' + stars + ' · ' + date + '</div>' +
+          '<div style="font-size:0.85rem; color:var(--text); margin-bottom:0.75rem; font-weight:300;">' + esc(r.body) + '</div>' +
+          '<button class="profile-delete-btn" id="profDelBtn_' + r.id + '" onclick="confirmDeleteProfile(\'' + r.id + '\')">🗑️ Delete</button>' +
+        '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function confirmDeleteProfile(id){
+  const btn = document.getElementById('profDelBtn_' + id);
+  if(btn.dataset.confirm === 'true'){
+    deleteReviewProfile(id);
+  } else {
+    btn.dataset.confirm = 'true';
+    btn.textContent = '⚠️ Confirm Delete';
+    btn.style.color = 'var(--neon-yellow)';
+    btn.style.borderColor = 'var(--neon-yellow)';
+    setTimeout(() => {
+      if(btn.dataset.confirm === 'true'){
+        btn.dataset.confirm = 'false';
+        btn.textContent = '🗑️ Delete';
+        btn.style.color = 'var(--neon-pink)';
+        btn.style.borderColor = 'rgba(255,61,139,0.2)';
+      }
+    }, 3000);
+  }
+}
+
+async function deleteReviewProfile(id){
+  const btn = document.getElementById('profDelBtn_' + id);
+  btn.disabled = true; btn.textContent = 'Deleting...';
+  
+  const {error} = await db.from('reviews').delete().eq('id', id).eq('user_id', currentUser.id);
+  if(error){
+    showToast('Failed to delete: ' + error.message, 'error');
+    btn.disabled = false; btn.textContent = '🗑️ Delete';
+  } else {
+    showToast('Review deleted!', 'success');
+    allReviews = allReviews.filter(r => r.id !== id);
+    renderProfileReviews();
+    renderReviews();
+    buildTicker();
+    buildCharts();
+  }
+}
+
+// ── WAITLIST / NOTIFY ME ──────────────────────────────────────
+async function submitNotifyMe(){
+  const email = document.getElementById('notifyEmail').value.trim();
+  const btn = document.querySelector('.notify-btn');
+  if(!email){
+    showToast('Please enter your email', 'error');
+    return;
+  }
+  btn.disabled = true; btn.textContent = 'Joining...';
+  const {error} = await db.from('waitlist').insert([{email}]);
+  
+  if(error){
+    if(error.message.includes('unique constraint') || error.message.includes('duplicate key value')) {
+      showToast('You are already on the waitlist! 🎉', 'success');
+      document.getElementById('notifyEmail').value = '';
+    } else {
+      showToast('Error joining waitlist: ' + error.message, 'error');
+    }
+    btn.disabled = false; btn.textContent = 'Notify Me';
+  } else {
+    showToast('You are on the waitlist! 🚀', 'success');
+    document.getElementById('notifyEmail').value = '';
+    btn.textContent = 'Joined!';
+    setTimeout(() => { btn.disabled = false; btn.textContent = 'Notify Me'; }, 3000);
+  }
+}
+
+// ── INTERACTIVE CARDS ─────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const stack = document.querySelector('.card-stack');
+  if(stack){
+    stack.addEventListener('click', () => {
+      const cards = Array.from(stack.querySelectorAll('.review-card'));
+      if(cards.length < 2) return;
+      
+      const topCard = cards[0];
+      stack.appendChild(topCard);
+      
+      const newCards = Array.from(stack.querySelectorAll('.review-card'));
+      newCards.forEach((c, i) => {
+        c.style.animation = 'none';
+        c.offsetHeight; 
+        if(i === 0) { c.style.animation = 'float1 6s ease-in-out infinite'; c.style.opacity = '1'; }
+        if(i === 1) { c.style.animation = 'float2 7s ease-in-out infinite'; c.style.opacity = '0.8'; }
+        if(i === 2) { c.style.animation = 'float3 8s ease-in-out infinite'; c.style.opacity = '0.6'; }
+      });
+    });
+  }
+});
+</script>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
 
@@ -37,7 +174,7 @@
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -239,7 +376,7 @@ h1 .l3 { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4); }
 @keyframes fadeIn { from{opacity:0} to{opacity:1} }
 .fg { margin-bottom: 1.5rem; }
 .fg label { display: block; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 0.6rem; }
-.fg input, .fg textarea, .fg select { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 0.85rem 1rem; border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 0.95rem; transition: all 0.2s; }
+.fg input, .fg textarea, .fg select { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 0.85rem 1rem; border-radius: 12px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.95rem; transition: all 0.2s; }
 .fg input:focus, .fg textarea:focus, .fg select:focus { outline: none; border-color: rgba(255,255,255,0.4); background: rgba(0,0,0,0.5); box-shadow: 0 0 0 3px rgba(255,255,255,0.05); }
 .fg textarea { resize: vertical; min-height: 120px; }
 .fg select { cursor: pointer; }
@@ -265,7 +402,7 @@ h1 .l3 { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4); }
 
 footer { padding: 3rem 4rem; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.2); }
 .footer-logo { font-size: 1.25rem; font-weight: 800; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.02em; }
-.footer-copy { font-size: 0.8rem; color: var(--muted); font-family: 'Inter', sans-serif; font-weight: 300; }
+.footer-copy { font-size: 0.8rem; color: var(--muted); font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 300; }
 
 /* MAPS BUTTON ON CARDS */
 .maps-btn { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--surface); border: 1px solid var(--border); color: #fff; font-size: 0.8rem; font-weight: 500; padding: 0.5rem 1rem; border-radius: 100px; cursor: pointer; transition: all 0.2s; margin-top: 0.75rem; text-decoration: none; }
@@ -409,7 +546,36 @@ footer { padding: 3rem 4rem; border-top: 1px solid var(--border); display: flex;
   .loc-tab { text-align: center; padding: 0.6rem 0.5rem; }
 }
 
+
+/* PROFILE MODAL */
+.profile-reviews-list { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+.profile-review-item { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; display: flex; gap: 1rem; align-items: flex-start; }
+.profile-review-img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
+.profile-review-content { flex: 1; }
+.profile-review-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.25rem; }
+.profile-review-meta { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.5rem; }
+.profile-delete-btn { background: rgba(255,61,139,0.1); color: var(--neon-pink); border: 1px solid rgba(255,61,139,0.2); padding: 0.4rem 0.8rem; font-size: 0.75rem; border-radius: 100px; cursor: pointer; transition: all 0.2s; }
+.profile-delete-btn:hover { background: rgba(255,61,139,0.2); }
+
+/* NOTIFY ME */
+.notify-wrap { display: flex; gap: 0.5rem; margin-top: 1.5rem; width: 100%; max-width: 320px; }
+.notify-input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 0.75rem 1rem; border-radius: 100px; font-family: 'Plus Jakarta Sans', sans-serif; }
+.notify-input:focus { outline: none; border-color: rgba(255,255,255,0.4); }
+.notify-btn { background: #fff; color: #000; border: none; padding: 0.75rem 1.25rem; border-radius: 100px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+.notify-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255,255,255,0.2); }
+
+/* SORTING UI */
+.sort-select { background: var(--surface); border: 1px solid var(--border); color: #fff; padding: 0.6rem 1.25rem; border-radius: 100px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-left: auto; backdrop-filter: var(--glass-blur); }
+.sort-select option { background: #13131a; color: #fff; }
+
+/* MAP ICONS IMG */
+.map-icon-img { width: 24px; height: 24px; border-radius: 4px; object-fit: cover; }
+
+/* INTERACTIVE CARDS */
+.card-stack { cursor: pointer; }
+.card-stack .review-card { transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
 </style>
+
 </head>
 <body>
 <div class="aurora-bg"></div>
@@ -426,7 +592,7 @@ footer { padding: 3rem 4rem; border-top: 1px solid var(--border); display: flex;
     <li><a href="#" onclick="document.getElementById('chartsSection').scrollIntoView({behavior:'smooth'});return false">🏆 Charts</a></li>
   </ul>
   <div class="nav-right">
-    <span id="userInfo"></span>
+    <button class="nav-btn ghost" id="userInfo" style="display:none" onclick="openProfile()">Profile</button>
     <button class="nav-btn ghost" id="loginBtn" onclick="openAuth()">Login</button>
     <button class="nav-btn" id="reviewBtn" style="display:none" onclick="openReview()">+ Drop Review</button>
     <button class="nav-btn danger" id="logoutBtn" style="display:none" onclick="doLogout()">Logout</button>
@@ -439,7 +605,11 @@ footer { padding: 3rem 4rem; border-top: 1px solid var(--border); display: flex;
   <div class="hero-left">
     <div class="badge">SRM Students Only 🔥</div>
     <h1>No BS.<br><span class="l2">Real Reviews.</span><br><span class="l3">By SRMites.</span></h1>
-    <p class="hero-desc">Hidden biryani spots, overpriced hostels, sketchy flats, that chai place near the back gate — <strong>everything your senior wouldn't tell you,</strong> now in one place.</p>
+    <p class="hero-desc">The raw, unfiltered truth your seniors gatekept — <strong>everything you need to know,</strong> now in one place.</p>
+    <div class="notify-wrap">
+      <input type="email" id="notifyEmail" class="notify-input" placeholder="Join the waitlist...">
+      <button class="notify-btn" onclick="submitNotifyMe()">Notify Me</button>
+    </div>
     <div class="hero-actions">
       <button class="btn-pri" onclick="document.getElementById('feedSection').scrollIntoView({behavior:'smooth'})">Start Exploring →</button>
       <button class="btn-ghost-hero" onclick="openAuthOrReview()">Drop a Review</button>
@@ -521,6 +691,13 @@ create table if not exists profiles (
   created_at timestamptz default now()
 );
 
+-- WAITLIST TABLE
+create table if not exists waitlist (
+  id uuid default gen_random_uuid() primary key,
+  email text unique not null,
+  created_at timestamptz default now()
+);
+
 -- BACKFILL EXISTING USERS INTO PROFILES
 insert into public.profiles (id, username)
 select id, coalesce(raw_user_meta_data->>'username', split_part(email, '@', 1) || '_' || substr(id::text, 1, 4))
@@ -574,6 +751,12 @@ create policy "Enforce image limits" on storage.objects for insert to authentica
     <button class="cat-btn" data-cat="spot" onclick="filterCat('spot',this)">🗺️ Spots</button>
     <button class="cat-btn" data-cat="flat" onclick="filterCat('flat',this)">🏠 Flats</button>
     <button class="cat-btn" data-cat="travel" onclick="filterCat('travel',this)">🚌 Travel</button>
+    <select id="sortSelect" class="sort-select" onchange="handleSortChange()">
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+      <option value="highest">Highest Rated</option>
+      <option value="lowest">Lowest Rated</option>
+    </select>
   </div>
   <div id="reviewsGrid" class="reviews-grid">
     <div class="state-box">Loading reviews...</div>
@@ -711,11 +894,11 @@ create policy "Enforce image limits" on storage.objects for insert to authentica
     <p id="mapsModalDesc">Choose your maps app</p>
     <div class="maps-options">
       <a class="map-option" id="gmapsLink" href="#" target="_blank" rel="noopener" onclick="closeModal('mapsModal')">
-        <span class="map-option-icon">🗺️</span>
+        <img class="map-icon-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROYfgz8DCCHphqgVkivbGw5_bPU3Jq6dxHC8JRxJsYnA&s=10" alt="Google Maps">
         <div><div class="map-option-label">Google Maps</div><div class="map-option-sub">Works on all devices</div></div>
       </a>
       <a class="map-option" id="applemapsLink" href="#" target="_blank" rel="noopener" onclick="closeModal('mapsModal')">
-        <span class="map-option-icon">🍎</span>
+        <img class="map-icon-img" src="https://banner2.cleanpng.com/20180713/qgf/kisspng-apple-logo-computer-icons-symbol-nike-inc-5b4908cd8f2049.1665534815315130375863.jpg" alt="Apple Maps">
         <div><div class="map-option-label">Apple Maps</div><div class="map-option-sub">iPhone / Mac recommended</div></div>
       </a>
       <a class="map-option" id="wazeLink" href="#" target="_blank" rel="noopener" onclick="closeModal('mapsModal')">
@@ -726,7 +909,32 @@ create policy "Enforce image limits" on storage.objects for insert to authentica
   </div>
 </div>
 
+
+<!-- PROFILE MODAL -->
+<div class="overlay" id="profileModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('profileModal')">✕</button>
+    <h2>Your Profile</h2>
+    <p class="modal-sub" id="profileEmail">you@srmist.edu.in</p>
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:1rem; margin-bottom:1rem; flex-wrap:wrap; gap:1rem;">
+      <h3 style="font-size:1.1rem; color:#fff">Your Reviews</h3>
+      <select id="profileSortSelect" class="sort-select" onchange="renderProfileReviews()" style="margin:0;">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="highest">Highest Rated</option>
+        <option value="lowest">Lowest Rated</option>
+      </select>
+    </div>
+    
+    <div id="profileReviewsContainer" class="profile-reviews-list">
+      <div class="state-box">Loading your reviews...</div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
+
 
 <script>
 // ── SUPABASE ──────────────────────────────────────────────────
@@ -739,7 +947,8 @@ const db = createClient(
 // ── STATE ─────────────────────────────────────────────────────
 let currentUser = null
 let currentRating = 0
-let currentFilter = 'all'
+let currentFilter = 'all';
+let currentSort = 'newest';
 let allReviews = []
 let currentLat = null
 let currentLng = null
@@ -759,6 +968,7 @@ function setUser(u){
   db.from('profiles').select('username').eq('id', u.id).single().then(({data}) => {
     const name = data?.username || u.user_metadata?.username || u.email.split('@')[0];
     document.getElementById('userInfo').textContent='@'+name;
+    document.getElementById('userInfo').style.display='inline-block';
   });
   document.getElementById('loginBtn').style.display='none'
   document.getElementById('reviewBtn').style.display='inline-block'
@@ -784,39 +994,15 @@ async function doLogin(){
   const {error}=await db.auth.signInWithPassword({email,password:pass})
   btn.disabled=false;btn.textContent='Login →'
   if(error){
-    if(error.message.includes('unique constraint') || error.message.includes('duplicate key value violates unique constraint')) {
-      showErr(errEl,'Username @'+username+' is already taken — pick another one');
-    } else if(error.message.includes('weak_password')) {
+    if(error.message.includes('unique constraint') || error.message.includes('duplicate key value')) {
+      showErr(errEl, 'Username @' + username + ' is already taken — pick another one');
+    } else if(error.message.includes('weak_password') || error.message.includes('Password')) {
       showErr(errEl, error.message);
+    } else if(error.message.includes('Database error saving new user')) {
+      showErr(errEl, 'Username @' + username + ' might be taken, or invalid.');
     } else {
       console.error(error);
-      showErr(errEl,'Something went wrong, try again');
-    }
-  }
-  else showToast('Logged in! Welcome back 🔥','success')
-}
-
-async function doSignup(){
-  const email=document.getElementById('signupEmail').value.trim()
-  const pass=document.getElementById('signupPassword').value
-  const username=document.getElementById('signupUsername').value.trim().replace('@','')
-  const errEl=document.getElementById('signupError')
-  const sucEl=document.getElementById('signupSuccess')
-  const btn=document.getElementById('signupBtn2')
-  errEl.style.display='none';sucEl.style.display='none'
-  if(!email||!pass||!username){showErr(errEl,'Fill in all fields');return}
-  if(pass.length<8){showErr(errEl,'Password needs at least 8 characters');return}
-  if(!/^[a-zA-Z0-9_]+$/.test(username)){showErr(errEl,'Username can only contain letters, numbers and underscores');return}
-
-  btn.textContent='Creating account...'
-  const {error}=await db.auth.signUp({email,password:pass,options:{data:{username}}})
-  btn.disabled=false;btn.textContent='Create Account →'
-  if(error){
-    if(error.message.includes('Invalid login credentials') || error.message.includes('Email not confirmed')) {
-      showErr(errEl, error.message);
-    } else {
-      console.error(error);
-      showErr(errEl,'Something went wrong, try again');
+      showErr(errEl, 'Something went wrong: ' + error.message);
     }
   }
   else{sucEl.style.display='block';showToast('Check your email to confirm! 📬','success')}
@@ -853,7 +1039,17 @@ async function loadReviews(){
 function renderReviews(){
   const grid=document.getElementById('reviewsGrid')
   const list=currentFilter==='all'?allReviews:allReviews.filter(r=>r.category===currentFilter)
+  
+  // Sort reviews
+  list.sort((a,b)=>{
+    if(currentSort==='newest') return new Date(b.created_at) - new Date(a.created_at);
+    if(currentSort==='oldest') return new Date(a.created_at) - new Date(b.created_at);
+    if(currentSort==='highest') return b.rating - a.rating;
+    if(currentSort==='lowest') return a.rating - b.rating;
+  });
+
   if(!list.length){
+
     grid.innerHTML=`<div class="empty-state"><div class="icon">🫥</div><p>No reviews here yet.<br>Be the first to drop one!</p></div>`
     return
   }
