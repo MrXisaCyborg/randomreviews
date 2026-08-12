@@ -752,10 +752,10 @@ create policy "Enforce image limits" on storage.objects for insert to authentica
   <h2 class="section-title">What's everyone saying?</h2>
   <div class="cat-filter">
     <button class="cat-btn active" data-cat="all" onclick="filterCat('all',this)">🔥 All</button>
-    <button class="cat-btn" data-cat="food" onclick="filterCat('food',this)">🍜 Food</button>
-    <button class="cat-btn" data-cat="spot" onclick="filterCat('spot',this)">🗺️ Spots</button>
-    <button class="cat-btn" data-cat="flat" onclick="filterCat('flat',this)">🏠 Flats</button>
-    <button class="cat-btn" data-cat="travel" onclick="filterCat('travel',this)">🚌 Travel</button>
+    <button class="cat-btn" data-cat="food" onclick="filterCat('food',this)"> Food</button>
+    <button class="cat-btn" data-cat="spot" onclick="filterCat('spot',this)"> Spots</button>
+    <button class="cat-btn" data-cat="flat" onclick="filterCat('flat',this)"> Flats</button>
+    <button class="cat-btn" data-cat="travel" onclick="filterCat('travel',this)"> Travel</button>
     <select id="sortSelect" class="sort-select" onchange="handleSortChange()">
       <option value="newest">Newest First</option>
       <option value="oldest">Oldest First</option>
@@ -830,10 +830,10 @@ create policy "Enforce image limits" on storage.objects for insert to authentica
     <div class="fg">
       <label>Category</label>
       <select id="rCategory">
-        <option value="food">🍜 Food & Drinks</option>
-        <option value="spot">🗺️ Hidden Spot</option>
-        <option value="flat">🏠 Flat / PG</option>
-        <option value="travel">🚌 Travel & Transit</option>
+        <option value="food">Food & Drinks</option>
+        <option value="spot"> Hidden Spot</option>
+        <option value="flat"> Flat / PG</option>
+        <option value="travel"> Travel & Transit</option>
       </select>
     </div>
     <div class="fg"><label>Title</label><input type="text" id="rTitle" placeholder="e.g. Shawarma cart near Gate 1"></div>
@@ -1059,7 +1059,7 @@ function renderReviews(){
     return
   }
   const tagMap={food:'tag-food',spot:'tag-spot',flat:'tag-flat',travel:'tag-travel'}
-  const catLabel={food:'🍜 Food',spot:'🗺️ Spot',flat:'🏠 Flat',travel:'🚌 Travel'}
+  const catLabel={food:'Food',spot:'Spot',flat:'Flat',travel:'Travel'}
 
   // Group all reviews by normalized title to compute aggregates
   const aggMap={}
@@ -1224,7 +1224,7 @@ function buildCharts(){
   document.getElementById('weekRange').textContent=weekLabel
 
   const cats=['food','spot','flat','travel']
-  const catEmoji={food:'🍜',spot:'🗺️',flat:'🏠',travel:'🚌'}
+  const catEmoji={food:'',spot:'',flat:'',travel:''}
   const catName={food:'Best Food & Drinks',spot:'Best Hidden Spots',flat:'Best Flats & PGs',travel:'Best Travel Routes'}
 
   // For each category: group by title, calc weighted avg, rank top 5
@@ -1378,7 +1378,7 @@ function openDetail(reviewId){
   const date=new Date(r.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})
   const uname=r.profiles?.username||r.username||'anon'
   const tagMap={food:'tag-food',spot:'tag-spot',flat:'tag-flat',travel:'tag-travel'}
-  const catLabel={food:'🍜 Food',spot:'🗺️ Spot',flat:'🏠 Flat',travel:'🚌 Travel'}
+  const catLabel={food:'Food',spot:'Spot',flat:'Flat',travel:'Travel'}
 
   // Aggregate
   const agg={}
