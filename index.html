@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Random Reviews — SRM's Unfiltered Guide</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0a0f'/%3E%3Crect width='64' height='64' rx='14' fill='%23f5e642' opacity='0.12'/%3E%3Ctext x='50%25' y='54%25' font-size='38' text-anchor='middle' dominant-baseline='middle' font-family='serif'%3E⭐%3C/text%3E%3Ctext x='50%25' y='88%25' font-size='10' text-anchor='middle' font-family='monospace' fill='%23f5e642' font-weight='bold'%3ERR%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Familjen+Grotesk:wght@400;500;600;700;800&family=Permanent+Marker&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
+<style>
+  :root {
+    --bg:#0a0a0f; --surface:#13131a; --neon-yellow:#f5e642; --neon-pink:#ff3d8b;
+    --neon-cyan:#00e5ff; --neon-orange:#ff6b2b; --text:#f0eee8; --muted:#6b6b80;
+    --border:rgba(245,230,66,0.15);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'Familjen Grotesk',sans-serif;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;opacity:.4}
+
+  /* NAV */
+  nav{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 3rem;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:500;background:rgba(10,10,15,.95);backdrop-filter:blur(20px)}
+  .logo{font-family:'Permanent Marker',cursive;font-size:1.4rem;color:var(--neon-yellow);text-shadow:0 0 20px rgba(245,230,66,.4);text-decoration:none}
+  .logo span{color:var(--neon-pink)}
+  .nav-links{display:flex;gap:2rem;list-style:none}
+  .nav-links a{color:var(--muted);text-decoration:none;font-weight:600;font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;transition:color .2s}
+  .nav-links a:hover,.nav-links a.active{color:var(--neon-yellow)}
+  .nav-right{display:flex;gap:.75rem;align-items:center}
+  #userInfo{font-size:.75rem;color:var(--muted);font-family:'Space Mono',monospace}
+  .nav-btn{background:var(--neon-yellow);color:#0a0a0f;border:none;padding:.55rem 1.25rem;font-family:'Familjen Grotesk',sans-serif;font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));transition:all .2s}
+  .nav-btn:hover{background:var(--neon-pink);color:#fff}
+  .nav-btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border);clip-path:none}
+  .nav-btn.ghost:hover{border-color:var(--neon-cyan);color:var(--neon-cyan);background:transparent}
+  .nav-btn.danger{background:transparent;color:var(--neon-pink);border:1px solid rgba(255,61,139,.3);clip-path:none}
+  .nav-btn.danger:hover{background:rgba(255,61,139,.1)}
+
+  /* MOBILE BOTTOM FAB */
+  .fab{display:none;position:fixed;bottom:1.5rem;right:1.5rem;z-index:400;background:var(--neon-yellow);color:#0a0a0f;border:none;width:56px;height:56px;font-size:1.5rem;cursor:pointer;box-shadow:0 8px 24px rgba(245,230,66,.3);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));transition:all .2s}
+  .fab:hover{background:var(--neon-pink);box-shadow:0 8px 24px rgba(255,61,139,.3)}
+
+  /* HERO */
+  .hero{min-height:90vh;display:grid;grid-template-columns:1fr 1fr;position:relative;overflow:hidden}
+  .hero-bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(245,230,66,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(245,230,66,.04) 1px,transparent 1px);background-size:60px 60px}
+  .hero-left{padding:5rem 3rem 5rem 4rem;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:2}
+  .badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(245,230,66,.1);border:1px solid rgba(245,230,66,.3);color:var(--neon-yellow);padding:.35rem .9rem;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;width:fit-content;margin-bottom:1.75rem;animation:fadeUp .6s ease both}
+  .badge::before{content:'';width:6px;height:6px;background:var(--neon-yellow);border-radius:50%;animation:blink 1.2s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+  h1{font-size:clamp(2.8rem,4.5vw,4.5rem);font-weight:800;line-height:1.0;letter-spacing:-.03em;animation:fadeUp .7s .1s ease both}
+  h1 .l2{color:var(--neon-pink)}
+  h1 .l3{color:transparent;-webkit-text-stroke:2px var(--neon-cyan)}
+  .hero-desc{margin-top:1.5rem;color:var(--muted);font-size:1rem;line-height:1.7;max-width:420px;animation:fadeUp .7s .2s ease both}
+  .hero-desc strong{color:var(--text)}
+  .hero-actions{margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;animation:fadeUp .7s .3s ease both}
+  .btn-pri{background:var(--neon-yellow);color:#0a0a0f;border:none;padding:.85rem 1.8rem;font-family:'Familjen Grotesk',sans-serif;font-weight:800;font-size:.95rem;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));transition:all .2s}
+  .btn-pri:hover{background:var(--neon-pink);color:#fff;transform:translateY(-2px)}
+  .btn-ghost-hero{background:transparent;color:var(--text);border:1px solid var(--border);padding:.85rem 1.8rem;font-family:'Familjen Grotesk',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;transition:all .2s}
+  .btn-ghost-hero:hover{border-color:var(--neon-cyan);color:var(--neon-cyan)}
+  .hero-stats{margin-top:3rem;display:flex;gap:2.5rem;animation:fadeUp .7s .4s ease both}
+  .stat-num{font-family:'Space Mono',monospace;font-size:1.6rem;font-weight:700;color:var(--neon-yellow)}
+  .stat-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:.2rem}
+  .hero-right{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;padding:3rem}
+  .card-stack{position:relative;width:320px;height:460px}
+  .review-card{position:absolute;background:var(--surface);border:1px solid var(--border);padding:1.25rem;width:290px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  .review-card:nth-child(1){top:0;left:10px;border-top:3px solid var(--neon-yellow);animation:float1 4s ease-in-out infinite;transform:rotate(-2deg)}
+  .review-card:nth-child(2){top:80px;left:50px;border-top:3px solid var(--neon-pink);animation:float2 5s ease-in-out infinite;transform:rotate(1.5deg)}
+  .review-card:nth-child(3){top:160px;left:5px;border-top:3px solid var(--neon-cyan);animation:float3 4.5s ease-in-out infinite;transform:rotate(-1deg)}
+  @keyframes float1{0%,100%{transform:rotate(-2deg) translateY(0)}50%{transform:rotate(-2deg) translateY(-8px)}}
+  @keyframes float2{0%,100%{transform:rotate(1.5deg) translateY(0)}50%{transform:rotate(1.5deg) translateY(-12px)}}
+  @keyframes float3{0%,100%{transform:rotate(-1deg) translateY(0)}50%{transform:rotate(-1deg) translateY(-6px)}}
+  .card-tag{font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:.2rem .5rem;width:fit-content;margin-bottom:.6rem}
+  .tag-food{background:rgba(255,107,43,.2);color:var(--neon-orange)}
+  .tag-spot{background:rgba(0,229,255,.15);color:var(--neon-cyan)}
+  .tag-flat{background:rgba(255,61,139,.15);color:var(--neon-pink)}
+  .tag-travel{background:rgba(245,230,66,.15);color:var(--neon-yellow)}
+  .card-title{font-weight:700;font-size:.95rem;margin-bottom:.4rem}
+  .card-body{font-size:.78rem;color:var(--muted);line-height:1.6}
+  .card-footer{margin-top:.85rem;display:flex;align-items:center;justify-content:space-between}
+  .stars{color:var(--neon-yellow);font-size:.8rem;letter-spacing:1px}
+  .card-author{font-size:.65rem;color:var(--muted);font-family:'Space Mono',monospace}
+  .card-img-ph{width:100%;height:80px;background:linear-gradient(135deg,rgba(245,230,66,.08),rgba(255,61,139,.08));border:1px dashed rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:.6rem}
+
+  /* TICKER */
+  .ticker-wrap{padding:2rem 0;overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .ticker-label{text-align:center;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin-bottom:1rem}
+  .ticker-track{display:flex;gap:1.5rem;width:max-content;animation:ticker 25s linear infinite}
+  @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .ti{background:var(--surface);border:1px solid var(--border);padding:.5rem 1rem;white-space:nowrap;font-size:.8rem;display:flex;gap:.5rem;align-items:center}
+  .ti-star{color:var(--neon-yellow)}
+  .ti-name{color:var(--muted);font-size:.7rem;font-family:'Space Mono',monospace}
+
+  /* FEED */
+  .feed-section{padding:5rem 4rem}
+  .section-label{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--neon-cyan);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.75rem}
+  .section-label::before{content:'// '}
+  .section-title{font-size:clamp(1.8rem,3vw,2.6rem);font-weight:800;letter-spacing:-.03em;margin-bottom:2rem}
+  .cat-filter{display:flex;gap:.75rem;margin-bottom:2.5rem;flex-wrap:wrap}
+  .cat-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:.45rem 1.1rem;font-family:'Familjen Grotesk',sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;text-transform:uppercase;letter-spacing:.05em;transition:all .2s}
+  .cat-btn:hover,.cat-btn.active{background:var(--neon-yellow);color:#0a0a0f;border-color:var(--neon-yellow)}
+  .reviews-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem}
+  .r-card{background:var(--surface);border:1px solid var(--border);padding:1.5rem;transition:border-color .2s,transform .2s;position:relative;overflow:hidden}
+  .r-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+  .r-card.food::before{background:var(--neon-orange)}
+  .r-card.spot::before{background:var(--neon-cyan)}
+  .r-card.flat::before{background:var(--neon-pink)}
+  .r-card.travel::before{background:var(--neon-yellow)}
+  .r-card:hover{border-color:rgba(245,230,66,.3);transform:translateY(-3px)}
+  .r-card img{width:100%;height:160px;object-fit:cover;margin-bottom:1rem}
+  .r-card-title{font-weight:800;font-size:1rem;margin-bottom:.5rem}
+  .r-card-body{font-size:.85rem;color:var(--muted);line-height:1.6;margin-bottom:1rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .r-card-meta{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+  .r-card-author{font-size:.7rem;color:var(--muted);font-family:'Space Mono',monospace}
+  .r-card-location{font-size:.72rem;color:var(--muted);margin-top:.4rem}
+  .r-card-location::before{content:'📍 '}
+  .state-box{text-align:center;padding:4rem;color:var(--muted);font-family:'Space Mono',monospace;font-size:.85rem}
+  .empty-state{text-align:center;padding:4rem;border:1px dashed var(--border);color:var(--muted);grid-column:1/-1}
+  .empty-state .icon{font-size:3rem;margin-bottom:1rem}
+
+  /* SQL PANEL */
+  .sql-panel{background:var(--surface);border:1px solid rgba(245,230,66,.35);padding:1.5rem 2rem;margin:0 4rem 2rem}
+  .sql-panel h3{color:var(--neon-yellow);font-size:.85rem;font-family:'Space Mono',monospace;margin-bottom:.75rem}
+  .sql-panel pre{background:var(--bg);padding:1rem;font-size:.72rem;color:var(--neon-cyan);overflow-x:auto;line-height:1.6;font-family:'Space Mono',monospace}
+  .sql-panel p{font-size:.8rem;color:var(--muted);margin-top:.75rem}
+
+  /* MODALS */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);z-index:800;display:none;align-items:center;justify-content:center;padding:1rem}
+  .overlay.open{display:flex}
+  .modal{background:var(--surface);border:1px solid var(--border);padding:2.5rem;width:100%;max-width:480px;position:relative;max-height:90vh;overflow-y:auto;animation:fadeUp .3s ease}
+  .modal h2{font-size:1.5rem;font-weight:800;margin-bottom:.4rem}
+  .modal-sub{color:var(--muted);font-size:.85rem;margin-bottom:2rem}
+  .modal-close{position:absolute;top:1.25rem;right:1.25rem;background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;transition:color .2s}
+  .modal-close:hover{color:var(--neon-pink)}
+  .modal-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:1.75rem}
+  .modal-tab{background:none;border:none;color:var(--muted);font-family:'Familjen Grotesk',sans-serif;font-weight:700;font-size:.9rem;padding:.75rem 1.25rem;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+  .modal-tab.active{color:var(--neon-yellow);border-bottom-color:var(--neon-yellow)}
+  .tab-panel{display:none}
+  .tab-panel.active{display:block}
+  .fg{margin-bottom:1.25rem}
+  .fg label{display:block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.4rem}
+  .fg input,.fg textarea,.fg select{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:.75rem 1rem;font-family:'Familjen Grotesk',sans-serif;font-size:.9rem;transition:border-color .2s;cursor:text}
+  .fg input:focus,.fg textarea:focus,.fg select:focus{outline:none;border-color:var(--neon-yellow)}
+  .fg textarea{resize:vertical;min-height:100px}
+  .fg select{cursor:pointer;option background:var(--surface)}
+  .star-rating{display:flex;gap:.5rem}
+  .star-btn{background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--muted);transition:color .15s,transform .15s}
+  .star-btn:hover,.star-btn.active{color:var(--neon-yellow);transform:scale(1.2)}
+  .file-upload{border:2px dashed var(--border);padding:1.5rem;text-align:center;cursor:pointer;transition:border-color .2s}
+  .file-upload:hover{border-color:var(--neon-yellow)}
+  .file-upload p{color:var(--muted);font-size:.82rem;margin-top:.4rem}
+  #imgPreview{width:100%;max-height:150px;object-fit:cover;margin-top:.75rem;display:none}
+  .form-error{color:var(--neon-pink);font-size:.8rem;margin-top:.4rem;display:none}
+  .form-success{color:#3ecf8e;font-size:.85rem;margin-top:.75rem;display:none}
+  .submit-btn{width:100%;background:var(--neon-yellow);color:#0a0a0f;border:none;padding:1rem;font-family:'Familjen Grotesk',sans-serif;font-weight:800;font-size:1rem;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));transition:all .2s;margin-top:1rem}
+  .submit-btn:hover{background:var(--neon-pink);color:#fff}
+  .submit-btn:disabled{opacity:.5;pointer-events:none}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:2rem;right:2rem;background:var(--surface);border:1px solid var(--border);padding:1rem 1.5rem;z-index:9000;font-size:.85rem;transform:translateY(100px);opacity:0;transition:all .3s;max-width:300px}
+  .toast.show{transform:translateY(0);opacity:1}
+  .toast.success{border-left:3px solid #3ecf8e}
+  .toast.error{border-left:3px solid var(--neon-pink)}
+
+  footer{padding:2rem 4rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .footer-logo{font-family:'Permanent Marker',cursive;font-size:1.1rem;color:var(--neon-yellow)}
+  .footer-copy{font-size:.72rem;color:var(--muted);font-family:'Space Mono',monospace}
+
+  /* MAPS BUTTON ON CARDS */
+  .maps-btn{display:inline-flex;align-items:center;gap:.35rem;background:transparent;border:1px solid var(--border);color:var(--muted);font-size:.7rem;font-family:'Space Mono',monospace;padding:.3rem .7rem;cursor:pointer;transition:all .2s;margin-top:.6rem;text-decoration:none}
+  .maps-btn:hover{border-color:var(--neon-cyan);color:var(--neon-cyan)}
+  .maps-btn svg{width:11px;height:11px;fill:currentColor;flex-shrink:0}
+
+  /* MAPS PICKER MODAL */
+  .maps-modal{background:var(--surface);border:1px solid rgba(0,229,255,.25);padding:2rem;width:100%;max-width:400px;position:relative;animation:fadeUp .3s ease}
+  .maps-modal h3{font-size:1.1rem;font-weight:800;margin-bottom:.3rem}
+  .maps-modal p{font-size:.8rem;color:var(--muted);margin-bottom:1.5rem}
+  .maps-options{display:flex;flex-direction:column;gap:.75rem}
+  .map-option{display:flex;align-items:center;gap:1rem;background:var(--bg);border:1px solid var(--border);padding:1rem 1.25rem;cursor:pointer;text-decoration:none;color:var(--text);transition:all .2s}
+  .map-option:hover{border-color:var(--neon-cyan);background:rgba(0,229,255,.05)}
+  .map-option-icon{font-size:1.5rem;flex-shrink:0}
+  .map-option-label{font-weight:700;font-size:.9rem}
+  .map-option-sub{font-size:.72rem;color:var(--muted);margin-top:.15rem}
+
+  /* LOCATION ATTACH in form */
+  .loc-attach{display:flex;gap:.5rem;align-items:flex-start}
+  .loc-attach input{flex:1}
+  .loc-detect-btn{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--neon-cyan);padding:.75rem .9rem;font-size:.8rem;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0;font-family:'Familjen Grotesk',sans-serif;font-weight:700}
+  .loc-detect-btn:hover{background:rgba(0,229,255,.2)}
+  .loc-coords{font-size:.7rem;color:var(--neon-cyan);font-family:'Space Mono',monospace;margin-top:.35rem;display:none}
+
+  /* AGGREGATE RATING on cards */
+  .agg-bar-wrap{margin-top:.75rem;border-top:1px solid var(--border);padding-top:.75rem}
+  .agg-summary{display:flex;align-items:center;gap:.75rem;margin-bottom:.6rem}
+  .agg-big-score{font-family:'Space Mono',monospace;font-size:1.6rem;font-weight:700;color:var(--neon-yellow);line-height:1}
+  .agg-right{flex:1}
+  .agg-stars-row{color:var(--neon-yellow);font-size:.85rem;letter-spacing:1px}
+  .agg-count{font-size:.7rem;color:var(--muted);margin-top:.1rem}
+  .bar-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.25rem}
+  .bar-label{font-size:.65rem;color:var(--muted);font-family:'Space Mono',monospace;width:12px;text-align:right;flex-shrink:0}
+  .bar-track{flex:1;height:5px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:2px;background:var(--neon-yellow);transition:width .6s ease}
+  .bar-num{font-size:.62rem;color:var(--muted);font-family:'Space Mono',monospace;width:20px;flex-shrink:0}
+
+  /* WEEKLY TOP CHARTS */
+  .charts-section{padding:5rem 4rem;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .charts-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2.5rem;flex-wrap:wrap;gap:1rem}
+  .charts-title-block .section-label{margin-bottom:.5rem}
+  .charts-countdown{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--muted);text-align:right}
+  .countdown-val{color:var(--neon-pink);font-weight:700}
+  .charts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem}
+  .chart-card{background:var(--bg);border:1px solid var(--border);padding:1.5rem;position:relative;overflow:hidden}
+  .chart-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+  .chart-card.food::before{background:var(--neon-orange)}
+  .chart-card.spot::before{background:var(--neon-cyan)}
+  .chart-card.flat::before{background:var(--neon-pink)}
+  .chart-card.travel::before{background:var(--neon-yellow)}
+  .chart-cat-label{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:.4rem}
+  .chart-podium{display:flex;flex-direction:column;gap:.5rem}
+  .chart-item{display:flex;align-items:center;gap:.75rem;padding:.5rem .6rem;transition:background .2s}
+  .chart-item:hover{background:rgba(255,255,255,.03)}
+  .chart-rank{font-family:'Space Mono',monospace;font-size:.75rem;font-weight:700;width:20px;flex-shrink:0}
+  .chart-rank.r1{color:var(--neon-yellow)}
+  .chart-rank.r2{color:#c0c0c0}
+  .chart-rank.r3{color:#cd7f32}
+  .chart-rank.rn{color:var(--muted)}
+  .chart-name{flex:1;font-size:.85rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chart-score{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--neon-yellow);flex-shrink:0}
+  .chart-reviews{font-size:.65rem;color:var(--muted);flex-shrink:0}
+  .chart-empty{color:var(--muted);font-size:.82rem;text-align:center;padding:1.5rem 0;font-family:'Space Mono',monospace}
+  .charts-updated{text-align:center;margin-top:2rem;font-size:.72rem;color:var(--muted);font-family:'Space Mono',monospace}
+  .charts-updated span{color:var(--neon-cyan)}
+
+  /* REVIEW DETAIL MODAL */
+  .detail-modal{background:var(--surface);border:1px solid var(--border);width:100%;max-width:600px;position:relative;max-height:92vh;overflow-y:auto;animation:fadeUp .3s ease}
+  .detail-img{width:100%;max-height:320px;object-fit:cover;display:block}
+  .detail-body{padding:1.75rem}
+  .detail-header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:.75rem}
+  .detail-title{font-size:1.3rem;font-weight:800;line-height:1.2}
+  .detail-stars{color:var(--neon-yellow);font-size:1rem;letter-spacing:2px;white-space:nowrap}
+  .detail-meta{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem}
+  .detail-author{font-size:.75rem;color:var(--muted);font-family:'Space Mono',monospace}
+  .detail-date{font-size:.75rem;color:var(--muted);font-family:'Space Mono',monospace}
+  .detail-text{font-size:.95rem;color:var(--text);line-height:1.7;margin-bottom:1.25rem}
+  .detail-loc{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;padding:.75rem;background:var(--bg);border:1px solid var(--border);margin-bottom:1rem}
+  .detail-loc-text{font-size:.82rem;color:var(--muted);flex:1}
+  .detail-loc-text::before{content:'📍 '}
+  .detail-maps-btns{display:flex;gap:.5rem;flex-wrap:wrap}
+  .detail-map-btn{display:inline-flex;align-items:center;gap:.4rem;background:transparent;border:1px solid var(--border);color:var(--text);font-size:.75rem;font-family:'Familjen Grotesk',sans-serif;font-weight:700;padding:.4rem .8rem;cursor:pointer;transition:all .2s;text-decoration:none}
+  .detail-map-btn.google:hover{border-color:#4285f4;color:#4285f4}
+  .detail-map-btn.apple:hover{border-color:#f0eee8;color:#f0eee8}
+  .detail-map-btn.waze:hover{border-color:#09d3f5;color:#09d3f5}
+  .detail-agg{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)}
+  .detail-agg-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.75rem}
+
+  /* LOCATION SEARCH */
+  .loc-search-results{background:var(--bg);border:1px solid var(--border);border-top:none;max-height:180px;overflow-y:auto;display:none}
+  .loc-result{padding:.6rem 1rem;font-size:.85rem;cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:.5rem}
+  .loc-result:hover{background:rgba(245,230,66,.06);color:var(--neon-yellow)}
+  .loc-result-icon{flex-shrink:0;font-size:.9rem}
+  .loc-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:.75rem}
+  .loc-tab{background:none;border:none;color:var(--muted);font-family:'Familjen Grotesk',sans-serif;font-weight:700;font-size:.8rem;padding:.5rem .9rem;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+  .loc-tab.active{color:var(--neon-cyan);border-bottom-color:var(--neon-cyan)}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ── MOBILE ─────────────────────────────────────────────────── */
+  @media(max-width:768px){
+    /* NAV */
+    nav{padding:.85rem 1.1rem}
+    .nav-links{display:none}
+    .nav-right{display:none}
+    #userInfo{display:none}
+    .hamburger{display:flex}
+    .fab{display:flex;align-items:center;justify-content:center}
+
+    /* HERO */
+    .hero{grid-template-columns:1fr;min-height:auto}
+    .hero-right{display:none}
+    .hero-left{padding:2.5rem 1.25rem 2rem}
+    h1{font-size:clamp(2rem,10vw,2.8rem)}
+    .hero-desc{font-size:.9rem}
+    .hero-actions{gap:.75rem}
+    .btn-pri,.btn-ghost-hero{padding:.75rem 1.4rem;font-size:.88rem;width:100%}
+    .hero-stats{gap:1.5rem;margin-top:2rem}
+    .stat-num{font-size:1.3rem}
+
+    /* TICKER */
+    .ticker-wrap{padding:1.25rem 0}
+
+    /* FEED */
+    .feed-section{padding:2rem 1.1rem}
+    .section-title{font-size:1.4rem}
+    .cat-filter{gap:.4rem;flex-wrap:wrap}
+    .cat-btn{padding:.35rem .75rem;font-size:.7rem}
+    .reviews-grid{grid-template-columns:1fr;gap:1rem}
+    .r-card{padding:1.1rem}
+    .r-card-title{font-size:.95rem}
+
+    /* CHARTS */
+    .charts-section{padding:2rem 1.1rem}
+    .charts-header{flex-direction:column;align-items:flex-start;gap:.75rem}
+    .charts-countdown{text-align:left;font-size:.7rem}
+    .charts-grid{grid-template-columns:1fr;gap:1rem}
+    .chart-card{padding:1.1rem}
+
+    /* SQL */
+    .sql-panel{margin:0 1.1rem 1.1rem}
+    .sql-panel pre{font-size:.65rem}
+
+    /* FOOTER */
+    footer{flex-direction:column;gap:.75rem;text-align:center;padding:1.5rem 1.1rem}
+
+    /* MODALS — full screen on mobile */
+    .overlay{padding:0;align-items:flex-end}
+    .modal{padding:1.5rem 1.25rem;max-height:92vh;border-radius:0;border-bottom:none;border-left:none;border-right:none;border-top:2px solid var(--neon-yellow);max-width:100%}
+    .modal h2{font-size:1.25rem}
+    .detail-modal{max-height:94vh;border-radius:0;max-width:100%}
+    .detail-body{padding:1.1rem}
+    .detail-title{font-size:1.1rem}
+    .detail-maps-btns{gap:.35rem;flex-wrap:wrap}
+    .detail-map-btn{font-size:.7rem;padding:.35rem .6rem}
+
+    /* MAPS MODAL */
+    .maps-modal{padding:1.5rem;max-width:100%;border-radius:0;border-left:none;border-right:none;border-bottom:none;border-top:2px solid var(--neon-cyan)}
+    .map-option{padding:.85rem 1rem}
+
+    /* LOCATION */
+    .loc-attach{flex-direction:column}
+    .loc-detect-btn{width:100%}
+    .loc-tabs{gap:0}
+    .loc-tab{flex:1;text-align:center;font-size:.75rem}
+
+    /* AGGREGATE */
+    .agg-big-score{font-size:1.3rem}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Random<span>Reviews</span></div>
+  <ul class="nav-links">
+    <li><a href="#" class="active" onclick="filterCat('all',this);return false">All</a></li>
+    <li><a href="#" onclick="filterCat('food',this);return false">Food</a></li>
+    <li><a href="#" onclick="filterCat('spot',this);return false">Spots</a></li>
+    <li><a href="#" onclick="filterCat('flat',this);return false">Flats</a></li>
+    <li><a href="#" onclick="filterCat('travel',this);return false">Travel</a></li>
+    <li><a href="#" onclick="document.getElementById('chartsSection').scrollIntoView({behavior:'smooth'});return false">🏆 Charts</a></li>
+  </ul>
+  <div class="nav-right">
+    <span id="userInfo"></span>
+    <button class="nav-btn ghost" id="loginBtn" onclick="openAuth()">Login</button>
+    <button class="nav-btn" id="reviewBtn" style="display:none" onclick="openReview()">+ Drop Review</button>
+    <button class="nav-btn danger" id="logoutBtn" style="display:none" onclick="doLogout()">Logout</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-grid"></div>
+  <div class="hero-left">
+    <div class="badge">SRM Students Only 🔥</div>
+    <h1>No BS.<br><span class="l2">Real Reviews.</span><br><span class="l3">By SRMites.</span></h1>
+    <p class="hero-desc">Hidden biryani spots, overpriced hostels, sketchy flats, that chai place near the back gate — <strong>everything your senior wouldn't tell you,</strong> now in one place.</p>
+    <div class="hero-actions">
+      <button class="btn-pri" onclick="document.getElementById('feedSection').scrollIntoView({behavior:'smooth'})">Start Exploring →</button>
+      <button class="btn-ghost-hero" onclick="openAuthOrReview()">Drop a Review</button>
+    </div>
+    <div class="hero-stats">
+      <div><div class="stat-num" id="totalCount">—</div><div class="stat-label">Reviews</div></div>
+      <div><div class="stat-num">4</div><div class="stat-label">Categories</div></div>
+      <div><div class="stat-num" id="userCount">—</div><div class="stat-label">SRMites</div></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="card-stack">
+      <div class="review-card">
+        <div class="card-img-ph">🍛</div>
+        <div class="card-tag tag-food">Food</div>
+        <div class="card-title">Saravana Bhavan Near Gate 3</div>
+        <div class="card-body">Bro the sambar rice at ₹45 hits different at 11pm. Always consistent, never disappoints.</div>
+        <div class="card-footer"><span class="stars">★★★★★</span><span class="card-author">@karthik_22cs</span></div>
+      </div>
+      <div class="review-card">
+        <div class="card-tag tag-spot">Hidden Spot</div>
+        <div class="card-title">Terrace Behind C Block</div>
+        <div class="card-body">Best cram spot or just vibe zone. Zero crowd after 8pm. Bring a jacket tho.</div>
+        <div class="card-footer"><span class="stars">★★★★☆</span><span class="card-author">@priya_mech21</span></div>
+      </div>
+      <div class="review-card">
+        <div class="card-tag tag-flat">Flat / PG</div>
+        <div class="card-title">Sai Residency, Potheri</div>
+        <div class="card-body">AC room, ₹7500/mo. Owner is chill, no curfew, WiFi is actually fast.</div>
+        <div class="card-footer"><span class="stars">★★★★☆</span><span class="card-author">@aditya_ece23</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-label">Latest drops</div>
+  <div class="ticker-track" id="tickerTrack">
+    <div class="ti" style="color:var(--muted);font-family:'Space Mono',monospace;font-size:.75rem">Loading...</div>
+  </div>
+</div>
+
+<!-- SQL SETUP HELPER -->
+<div class="sql-panel" id="sqlHelper" style="display:none">
+  <h3>⚠️ One-time DB setup needed — go to Supabase → SQL Editor → paste and run this:</h3>
+  <pre>create table if not exists reviews (
+  id uuid default gen_random_uuid() primary key,
+  created_at timestamp with time zone default now(),
+  user_id uuid references auth.users(id) on delete cascade,
+  username text,
+  category text check (category in ('food','spot','flat','travel')),
+  title text not null,
+  body text not null,
+  rating int check (rating between 1 and 5),
+  location_name text,
+  image_url text,
+  lat double precision,
+  lng double precision
+);
+
+-- SECURITY FIX: Restrict image_url domain
+alter table reviews drop constraint if exists check_image_url;
+alter table reviews add constraint check_image_url 
+check (image_url is null or image_url like 'https://crczujkkyaxgxcdlgqxh.supabase.co/storage/v1/object/public/review-images/%');
+
+alter table reviews enable row level security;
+drop policy if exists "Public read" on reviews;
+create policy "Public read" on reviews for select using (true);
+drop policy if exists "Auth insert" on reviews;
+create policy "Auth insert" on reviews for insert with check (auth.uid() = user_id);
+drop policy if exists "Own delete" on reviews;
+create policy "Own delete" on reviews for delete using (auth.uid() = user_id);
+
+-- PROFILES TABLE (Username Uniqueness)
+create table if not exists profiles (
+  id uuid references auth.users(id) primary key,
+  username text unique not null,
+  created_at timestamptz default now()
+);
+
+-- BACKFILL EXISTING USERS INTO PROFILES
+insert into public.profiles (id, username)
+select id, coalesce(raw_user_meta_data->>'username', split_part(email, '@', 1) || '_' || substr(id::text, 1, 4))
+from auth.users
+on conflict (id) do nothing;
+
+-- ADD RELATION FOR POSTGREST (so we can join reviews and profiles)
+alter table reviews drop constraint if exists fk_reviews_profiles;
+alter table reviews add constraint fk_reviews_profiles foreign key (user_id) references profiles(id) on delete cascade;
+
+alter table profiles enable row level security;
+drop policy if exists "Public read profiles" on profiles;
+create policy "Public read profiles" on profiles for select using (true);
+drop policy if exists "Auth insert profiles" on profiles;
+create policy "Auth insert profiles" on profiles for insert with check (auth.uid() = id);
+drop policy if exists "Auth update profiles" on profiles;
+create policy "Auth update profiles" on profiles for update using (auth.uid() = id);
+
+-- TRIGGER FOR NEW USERS
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, username)
+  values (new.id, new.raw_user_meta_data->>'username');
+  return new;
+end;
+$$ language plpgsql security definer;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
+-- STORAGE POLICY: 5MB limit and allowed MIME types
+drop policy if exists "Enforce image limits" on storage.objects;
+create policy "Enforce image limits" on storage.objects for insert to authenticated with check (
+  bucket_id = 'review-images' and
+  (storage.extension(name) in ('jpg', 'jpeg', 'png', 'webp')) and
+  (coalesce((metadata->>'size')::int, 0) <= 5242880)
+);</pre>
+  <p>After running, refresh this page. This panel disappears once the table is working.</p>
+</div>
+
+<!-- FEED -->
+<section class="feed-section" id="feedSection">
+  <div class="section-label">Browse reviews</div>
+  <h2 class="section-title">What's everyone saying?</h2>
+  <div class="cat-filter">
+    <button class="cat-btn active" data-cat="all" onclick="filterCat('all',this)">🔥 All</button>
+    <button class="cat-btn" data-cat="food" onclick="filterCat('food',this)">🍜 Food</button>
+    <button class="cat-btn" data-cat="spot" onclick="filterCat('spot',this)">🗺️ Spots</button>
+    <button class="cat-btn" data-cat="flat" onclick="filterCat('flat',this)">🏠 Flats</button>
+    <button class="cat-btn" data-cat="travel" onclick="filterCat('travel',this)">🚌 Travel</button>
+  </div>
+  <div id="reviewsGrid" class="reviews-grid">
+    <div class="state-box">Loading reviews...</div>
+  </div>
+</section>
+
+<!-- WEEKLY TOP CHARTS -->
+<section class="charts-section" id="chartsSection">
+  <div class="charts-header">
+    <div class="charts-title-block">
+      <div class="section-label">Every Sunday 5 PM</div>
+      <h2 class="section-title">Weekly Top Charts 🏆</h2>
+    </div>
+    <div class="charts-countdown">
+      Next drop in<br>
+      <span class="countdown-val" id="countdownVal">calculating...</span>
+    </div>
+  </div>
+  <div class="charts-grid" id="chartsGrid">
+    <div class="state-box">Building charts...</div>
+  </div>
+  <div class="charts-updated">Charts based on reviews from the <span id="weekRange">current week</span></div>
+</section>
+
+<footer>
+  <div class="footer-logo">RandomReviews</div>
+  <div class="footer-copy">// built for SRMites, by SRMites · 2025</div>
+</footer>
+
+<!-- AUTH MODAL -->
+<div class="overlay" id="authModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('authModal')">✕</button>
+    <h2>Welcome 👋</h2>
+    <p class="modal-sub">Sign in to drop reviews and help your batch.</p>
+
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tabLogin" onclick="switchTab('login')">Login</button>
+      <button class="modal-tab" id="tabSignup" onclick="switchTab('signup')">Sign Up</button>
+    </div>
+    <!-- LOGIN -->
+    <div class="tab-panel active" id="loginPanel">
+      <div class="fg"><label>Email</label><input type="email" id="loginEmail" placeholder="you@srmist.edu.in"></div>
+      <div class="fg"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
+      <div class="form-error" id="loginError"></div>
+      <button class="submit-btn" id="loginBtn2" onclick="doLogin()">Login →</button>
+    </div>
+    <!-- SIGNUP -->
+    <div class="tab-panel" id="signupPanel">
+      <div class="fg"><label>SRM Email</label><input type="email" id="signupEmail" placeholder="ra1234@srmist.edu.in"></div>
+      <div class="fg"><label>Password (min 8 chars)</label><input type="password" id="signupPassword" placeholder="••••••••"></div>
+      <div class="fg"><label>Display Name / Username</label><input type="text" id="signupUsername" placeholder="karthik_22cs"></div>
+      <div class="form-error" id="signupError"></div>
+      <div class="form-success" id="signupSuccess">✅ Check your email to confirm, then log in!</div>
+      <button class="submit-btn" id="signupBtn2" onclick="doSignup()">Create Account →</button>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEW MODAL -->
+<div class="overlay" id="reviewModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('reviewModal')">✕</button>
+    <h2>Drop a Review 🔥</h2>
+    <p class="modal-sub">Be real. Other SRMites are counting on you.</p>
+    <div class="fg">
+      <label>Category</label>
+      <select id="rCategory">
+        <option value="food">🍜 Food & Drinks</option>
+        <option value="spot">🗺️ Hidden Spot</option>
+        <option value="flat">🏠 Flat / PG</option>
+        <option value="travel">🚌 Travel & Transit</option>
+      </select>
+    </div>
+    <div class="fg"><label>Title</label><input type="text" id="rTitle" placeholder="e.g. Shawarma cart near Gate 1"></div>
+    <div class="fg">
+      <label>Location (optional)</label>
+      <div class="loc-tabs">
+        <button class="loc-tab active" id="locTabSearch" onclick="switchLocTab('search')">🔍 Search</button>
+        <button class="loc-tab" id="locTabDetect" onclick="switchLocTab('detect')">📍 Use My Location</button>
+      </div>
+      <div id="locSearchPane">
+        <input type="text" id="rLocation" placeholder="Search a place, e.g. Potheri Bus Stand" oninput="searchLocation(this.value)">
+        <div class="loc-search-results" id="locResults"></div>
+      </div>
+      <div id="locDetectPane" style="display:none">
+        <div style="display:flex;gap:.5rem">
+          <input type="text" id="rLocationGps" placeholder="GPS coordinates will appear here" readonly>
+          <button class="loc-detect-btn" onclick="detectLocation()">📍 Detect</button>
+        </div>
+      </div>
+      <div class="loc-coords" id="locCoords"></div>
+      <div id="gpsWarning" style="display:none; color:var(--neon-orange); font-size:0.7rem; margin-top:0.4rem;">
+        ⚠️ Sharing exact GPS on a flat/PG review may reveal where you live — consider using the Search tab with just the area name instead.
+      </div>
+    </div>
+    <div class="fg"><label>Your Review</label><textarea id="rBody" placeholder="Be honest. What did you actually think? Is it worth it?"></textarea></div>
+    <div class="fg">
+      <label>Rating</label>
+      <div class="star-rating">
+        <button class="star-btn" onclick="setRating(1)">★</button>
+        <button class="star-btn" onclick="setRating(2)">★</button>
+        <button class="star-btn" onclick="setRating(3)">★</button>
+        <button class="star-btn" onclick="setRating(4)">★</button>
+        <button class="star-btn" onclick="setRating(5)">★</button>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Photo (optional)</label>
+      <div class="file-upload" onclick="document.getElementById('photoInput').click()">
+        <p>📷 Click to upload a photo</p>
+        <p>JPG, PNG — max 5MB</p>
+        <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="previewImg(this)">
+        <img id="imgPreview" alt="preview">
+      </div>
+    </div>
+    <div class="form-error" id="reviewError"></div>
+    <button class="submit-btn" id="submitBtn" onclick="submitReview()">Post Review →</button>
+  </div>
+</div>
+
+<!-- REVIEW DETAIL MODAL -->
+<div class="overlay" id="detailModal">
+  <div class="detail-modal">
+    <button class="modal-close" onclick="closeModal('detailModal')" style="position:absolute;top:1rem;right:1rem;z-index:10;background:rgba(10,10,15,.8);border:1px solid var(--border);color:var(--text);font-size:1.1rem;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer">✕</button>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<!-- MAPS MODAL -->
+<div class="overlay" id="mapsModal">
+  <div class="maps-modal">
+    <button class="modal-close" onclick="closeModal('mapsModal')">✕</button>
+    <h3>📍 Open in Maps</h3>
+    <p id="mapsModalDesc">Choose your maps app</p>
+    <div class="maps-options">
+      <a class="map-option" id="gmapsLink" href="#" target="_blank" rel="noopener" onclick="closeModal('mapsModal')">
+        <span class="map-option-icon">🗺️</span>
+        <div><div class="map-option-label">Google Maps</div><div class="map-option-sub">Works on all devices</div></div>
+      </a>
+      <a class="map-option" id="applemapsLink" href="#" target="_blank" rel="noopener" onclick="closeModal('mapsModal')">
+        <span class="map-option-icon">🍎</span>
+        <div><div class="map-option-label">Apple Maps</div><div class="map-option-sub">iPhone / Mac recommended</div></div>
+      </a>
+      <a class="map-option" id="wazeLink" href="#" target="_blank" rel="noopener" onclick="closeModal('mapsModal')">
+        <span class="map-option-icon">🚗</span>
+        <div><div class="map-option-label">Waze</div><div class="map-option-sub">Best for driving / autos</div></div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── SUPABASE ──────────────────────────────────────────────────
+const { createClient } = supabase
+const db = createClient(
+  'https://crczujkkyaxgxcdlgqxh.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyY3p1amtreWF4Z3hjZGxncXhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1ODIzNDcsImV4cCI6MjA4NzE1ODM0N30.ytuBOH34PUvkT2XXD_Ky4TTuQZIIibNVyVInUvFTO4Y'
+)
+
+// ── STATE ─────────────────────────────────────────────────────
+let currentUser = null
+let currentRating = 0
+let currentFilter = 'all'
+let allReviews = []
+let currentLat = null
+let currentLng = null
+
+// ── AUTH ──────────────────────────────────────────────────────
+async function initAuth(){
+  const {data:{session}} = await db.auth.getSession()
+  if(session?.user) setUser(session.user)
+  db.auth.onAuthStateChange((_,session)=>{
+    if(session?.user) setUser(session.user)
+    else clearUser()
+  })
+}
+
+function setUser(u){
+  currentUser=u
+  db.from('profiles').select('username').eq('id', u.id).single().then(({data}) => {
+    const name = data?.username || u.user_metadata?.username || u.email.split('@')[0];
+    document.getElementById('userInfo').textContent='@'+name;
+  });
+  document.getElementById('loginBtn').style.display='none'
+  document.getElementById('reviewBtn').style.display='inline-block'
+  document.getElementById('logoutBtn').style.display='inline-block'
+  closeModal('authModal')
+}
+function clearUser(){
+  currentUser=null
+  document.getElementById('userInfo').textContent=''
+  document.getElementById('loginBtn').style.display='inline-block'
+  document.getElementById('reviewBtn').style.display='none'
+  document.getElementById('logoutBtn').style.display='none'
+}
+
+async function doLogin(){
+  const email=document.getElementById('loginEmail').value.trim()
+  const pass=document.getElementById('loginPassword').value
+  const errEl=document.getElementById('loginError')
+  const btn=document.getElementById('loginBtn2')
+  errEl.style.display='none'
+  if(!email||!pass){showErr(errEl,'Fill in all fields');return}
+  btn.disabled=true;btn.textContent='Logging in...'
+  const {error}=await db.auth.signInWithPassword({email,password:pass})
+  btn.disabled=false;btn.textContent='Login →'
+  if(error){
+    if(error.message.includes('unique constraint') || error.message.includes('duplicate key value violates unique constraint')) {
+      showErr(errEl,'Username @'+username+' is already taken — pick another one');
+    } else if(error.message.includes('weak_password')) {
+      showErr(errEl, error.message);
+    } else {
+      console.error(error);
+      showErr(errEl,'Something went wrong, try again');
+    }
+  }
+  else showToast('Logged in! Welcome back 🔥','success')
+}
+
+async function doSignup(){
+  const email=document.getElementById('signupEmail').value.trim()
+  const pass=document.getElementById('signupPassword').value
+  const username=document.getElementById('signupUsername').value.trim().replace('@','')
+  const errEl=document.getElementById('signupError')
+  const sucEl=document.getElementById('signupSuccess')
+  const btn=document.getElementById('signupBtn2')
+  errEl.style.display='none';sucEl.style.display='none'
+  if(!email||!pass||!username){showErr(errEl,'Fill in all fields');return}
+  if(pass.length<8){showErr(errEl,'Password needs at least 8 characters');return}
+  if(!/^[a-zA-Z0-9_]+$/.test(username)){showErr(errEl,'Username can only contain letters, numbers and underscores');return}
+
+  btn.textContent='Creating account...'
+  const {error}=await db.auth.signUp({email,password:pass,options:{data:{username}}})
+  btn.disabled=false;btn.textContent='Create Account →'
+  if(error){
+    if(error.message.includes('Invalid login credentials') || error.message.includes('Email not confirmed')) {
+      showErr(errEl, error.message);
+    } else {
+      console.error(error);
+      showErr(errEl,'Something went wrong, try again');
+    }
+  }
+  else{sucEl.style.display='block';showToast('Check your email to confirm! 📬','success')}
+}
+
+async function doLogout(){
+  await db.auth.signOut()
+  showToast('Logged out. See you! 👋','success')
+}
+
+
+
+async function loadReviews(){
+  document.getElementById('reviewsGrid').innerHTML='<div class="state-box">Loading reviews...</div>'
+  try{
+    const {data,error}=await db.from('reviews').select('*, profiles(username)').order('created_at',{ascending:false})
+    if(error) throw error
+    document.getElementById('sqlHelper').style.display='none'
+    allReviews=data||[]
+    renderReviews()
+    buildTicker()
+    buildCharts()
+    document.getElementById('totalCount').textContent=allReviews.length+'+'
+    document.getElementById('userCount').textContent=Math.max(1,Math.floor(allReviews.length*1.4))+'+'
+  }catch(e){
+    console.error(e)
+    document.getElementById('reviewsGrid').innerHTML='<div class="state-box">⚠️ Could not load reviews. See setup instructions above.</div>'
+    document.getElementById('sqlHelper').style.display='block'
+    document.getElementById('totalCount').textContent='0'
+    document.getElementById('userCount').textContent='0'
+  }
+}
+
+function renderReviews(){
+  const grid=document.getElementById('reviewsGrid')
+  const list=currentFilter==='all'?allReviews:allReviews.filter(r=>r.category===currentFilter)
+  if(!list.length){
+    grid.innerHTML=`<div class="empty-state"><div class="icon">🫥</div><p>No reviews here yet.<br>Be the first to drop one!</p></div>`
+    return
+  }
+  const tagMap={food:'tag-food',spot:'tag-spot',flat:'tag-flat',travel:'tag-travel'}
+  const catLabel={food:'🍜 Food',spot:'🗺️ Spot',flat:'🏠 Flat',travel:'🚌 Travel'}
+
+  // Group all reviews by normalized title to compute aggregates
+  const aggMap={}
+  allReviews.forEach(r=>{
+    const key=r.title.trim().toLowerCase()
+    if(!aggMap[key]) aggMap[key]={total:0,count:0,dist:{5:0,4:0,3:0,2:0,1:0}}
+    aggMap[key].total+=r.rating
+    aggMap[key].count++
+    aggMap[key].dist[r.rating]=(aggMap[key].dist[r.rating]||0)+1
+  })
+
+  grid.innerHTML=list.map(r=>{
+    const stars='★'.repeat(r.rating)+'☆'.repeat(5-r.rating)
+    const img=r.image_url?`<img src="${esc(r.image_url)}" alt="photo" loading="lazy">`:'';
+    const date=new Date(r.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short'})
+    const uname=r.profiles?.username||r.username||'anon'
+
+    // Aggregate block — only show if 2+ reviews for this place
+    const agg=aggMap[r.title.trim().toLowerCase()]
+    let aggHtml=''
+    if(agg&&agg.count>=2){
+      const avg=(agg.total/agg.count).toFixed(1)
+      const avgStars='★'.repeat(Math.round(agg.total/agg.count))+'☆'.repeat(5-Math.round(agg.total/agg.count))
+      const bars=[5,4,3,2,1].map(n=>{
+        const pct=agg.count>0?Math.round((agg.dist[n]||0)/agg.count*100):0
+        return `<div class="bar-row"><span class="bar-label">${n}</span><div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div><span class="bar-num">${agg.dist[n]||0}</span></div>`
+      }).join('')
+      aggHtml=`<div class="agg-bar-wrap">
+        <div class="agg-summary">
+          <div class="agg-big-score">${avg}</div>
+          <div class="agg-right">
+            <div class="agg-stars-row">${avgStars}</div>
+            <div class="agg-count">${agg.count} reviews total</div>
+          </div>
+        </div>
+        ${bars}
+      </div>`
+    }
+
+    // Location + maps
+    let locHtml=''
+    if(r.location_name||r.lat){
+      const pinIcon=`<svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`
+      const locText=r.location_name?esc(r.location_name):'Location attached'
+      const d={name:r.title,loc:r.location_name||'',lat:r.lat||null,lng:r.lng||null}
+      const ds=JSON.stringify(d).replace(/"/g,'&quot;')
+      locHtml=`<div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:.5rem">
+        <div class="r-card-location">${locText}</div>
+        <button class="maps-btn open-maps-btn" data-ds="${esc(ds)}">${pinIcon} Open in Maps</button>
+      </div>`
+    }
+
+    return `<div class="r-card ${r.category}" onclick="openDetail('${r.id}')" style="cursor:pointer">${img}<div class="card-tag ${tagMap[r.category]}">${catLabel[r.category]}</div><div class="r-card-title">${esc(r.title)}</div><div class="r-card-body">${esc(r.body)}</div>${locHtml}${aggHtml}<div class="r-card-meta" style="margin-top:.75rem"><span class="stars">${stars}</span><span class="r-card-author">@${esc(uname)} · ${date}</span></div></div>`
+  }).join('')
+}
+
+// ── TICKER ────────────────────────────────────────────────────
+function buildTicker(){
+  const track = document.getElementById('tickerTrack')
+  if(!allReviews.length){
+    track.innerHTML='<div class="ti" style="color:var(--muted);font-family:\'Space Mono\',monospace;font-size:.75rem">No reviews yet — be the first! 👀</div>'
+    return
+  }
+  // Take up to 10 most recent, then duplicate for seamless loop
+  const recent = allReviews.slice(0, 10)
+  const makeItem = r => {
+    const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating)
+    const uname = r.username || 'anon'
+    return `<div class="ti"><span class="ti-star">${stars}</span> ${esc(r.title)} <span class="ti-name">@${esc(uname)}</span></div>`
+  }
+  // Render twice for infinite scroll illusion
+  const html = recent.map(makeItem).join('')
+  track.innerHTML = html + html
+}
+
+
+async function submitReview(){
+  if(!currentUser){openAuth();return}
+  const title=document.getElementById('rTitle').value.trim()
+  const body=document.getElementById('rBody').value.trim()
+  const category=document.getElementById('rCategory').value
+  const locTab = document.getElementById('locTabDetect').classList.contains('active') ? 'detect' : 'search'
+  const location = locTab==='detect'
+    ? (document.getElementById('rLocationGps').value.trim() || (currentLat ? `${currentLat.toFixed(4)}, ${currentLng.toFixed(4)}` : ''))
+    : document.getElementById('rLocation').value.trim()
+  const errEl=document.getElementById('reviewError')
+  const btn=document.getElementById('submitBtn')
+  errEl.style.display='none'
+  if(!title){showErr(errEl,'Give your review a title');return}
+  if(!body){showErr(errEl,'Write something in the review');return}
+  if(!currentRating){showErr(errEl,'Pick a star rating');return}
+  btn.disabled=true;btn.textContent='Posting...'
+
+  // Upload photo if present
+  let imageUrl=null
+  const file=document.getElementById('photoInput').files[0]
+  if(file){
+    if(!['image/jpeg','image/png','image/webp'].includes(file.type)){showErr(errEl,'Only JPG, PNG, and WEBP allowed');btn.disabled=false;btn.textContent='Post Review →';return;}
+    if(file.size>5*1024*1024){showErr(errEl,'File too large (max 5MB)');btn.disabled=false;btn.textContent='Post Review →';return;}
+    const ext=file.name.split('.').pop()
+    const fname=`${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+    const {error:upErr}=await db.storage.from('review-images').upload(fname,file)
+    if(upErr){showErr(errEl,'Photo upload failed: '+upErr.message);btn.disabled=false;btn.textContent='Post Review →';return}
+    const {data:{publicUrl}}=db.storage.from('review-images').getPublicUrl(fname)
+    imageUrl=publicUrl
+  }
+
+  const uname=currentUser.user_metadata?.username||currentUser.email.split('@')[0]
+  const {error}=await db.from('reviews').insert({
+    user_id:currentUser.id, username:uname,
+    title, body, category, rating:currentRating,
+    location_name:location||null, image_url:imageUrl,
+    lat:currentLat||null, lng:currentLng||null
+  })
+  btn.disabled=false;btn.textContent='Post Review →'
+  if(error){
+    if(error.message.includes('policy')||error.message.includes('permission')){
+      showErr(errEl,'DB not set up yet — run the SQL setup from the panel above first.');
+    } else {
+      console.error(error);
+      showErr(errEl,'Something went wrong, try again');
+    }
+  } else {
+    showToast('Review posted! 🔥 Keeping it real.','success')
+    closeModal('reviewModal')
+    resetForm()
+    await loadReviews()
+    buildTicker()
+    buildCharts()
+  }
+}
+
+// ── WEEKLY TOP CHARTS ─────────────────────────────────────────
+function buildCharts(){
+  const grid=document.getElementById('chartsGrid')
+  if(!allReviews.length){
+    grid.innerHTML='<div class="state-box">No reviews yet — charts will appear once people start reviewing!</div>'
+    return
+  }
+
+  // Get this week's Sunday 5pm window
+  // Charts show top picks based on reviews from the past 7 days
+  const now=new Date()
+  const weekAgo=new Date(now.getTime()-7*24*60*60*1000)
+
+  // Figure out last Sunday 5pm IST (UTC+5:30)
+  const istOffset=5.5*60*60*1000
+  const nowIST=new Date(now.getTime()+istOffset)
+  const dayOfWeek=nowIST.getUTCDay() // 0=Sun
+  const lastSundayIST=new Date(nowIST)
+  lastSundayIST.setUTCDate(nowIST.getUTCDate()-dayOfWeek)
+  lastSundayIST.setUTCHours(11,30,0,0) // 5pm IST = 11:30 UTC
+  const windowStart=new Date(lastSundayIST.getTime()-istOffset)
+
+  // Use reviews from the last 7 days (rolling week)
+  const weekReviews=allReviews.filter(r=>new Date(r.created_at)>=weekAgo)
+  const sourceReviews=weekReviews.length>=3?weekReviews:allReviews // fallback to all time if too few
+
+  const weekLabel=weekReviews.length>=3
+    ?`${weekAgo.toLocaleDateString('en-IN',{day:'numeric',month:'short'})} – ${now.toLocaleDateString('en-IN',{day:'numeric',month:'short'})}`
+    :'All time (not enough weekly data yet)'
+  document.getElementById('weekRange').textContent=weekLabel
+
+  const cats=['food','spot','flat','travel']
+  const catEmoji={food:'🍜',spot:'🗺️',flat:'🏠',travel:'🚌'}
+  const catName={food:'Best Food & Drinks',spot:'Best Hidden Spots',flat:'Best Flats & PGs',travel:'Best Travel Routes'}
+
+  // For each category: group by title, calc weighted avg, rank top 5
+  const chartHTML=cats.map(cat=>{
+    const catRevs=sourceReviews.filter(r=>r.category===cat)
+    if(!catRevs.length){
+      return `<div class="chart-card ${cat}">
+        <div class="chart-cat-label">${catEmoji[cat]} ${catName[cat]}</div>
+        <div class="chart-empty">No reviews this week yet</div>
+      </div>`
+    }
+
+    // Aggregate by title
+    const places={}
+    catRevs.forEach(r=>{
+      const key=r.title.trim()
+      if(!places[key]) places[key]={title:key,total:0,count:0}
+      places[key].total+=r.rating
+      places[key].count++
+    })
+
+    // Sort: weighted score = avg * log(count+1) — rewards consistency + volume
+    const ranked=Object.values(places)
+      .map(p=>({...p,avg:p.total/p.count,score:(p.total/p.count)*Math.log(p.count+1)}))
+      .sort((a,b)=>b.score-a.score)
+      .slice(0,5)
+
+    const rankClass=['r1','r2','r3','rn','rn']
+    const rankLabel=['🥇','🥈','🥉','4','5']
+    const items=ranked.map((p,i)=>`
+      <div class="chart-item">
+        <span class="chart-rank ${rankClass[i]}">${rankLabel[i]}</span>
+        <span class="chart-name" title="${esc(p.title)}">${esc(p.title)}</span>
+        <span class="chart-score">${p.avg.toFixed(1)}★</span>
+        <span class="chart-reviews">${p.count}x</span>
+      </div>`).join('')
+
+    return `<div class="chart-card ${cat}">
+      <div class="chart-cat-label">${catEmoji[cat]} ${catName[cat]}</div>
+      <div class="chart-podium">${items}</div>
+    </div>`
+  }).join('')
+
+  grid.innerHTML=chartHTML
+}
+
+// ── COUNTDOWN to next Sunday 5pm IST ──────────────────────────
+function updateCountdown(){
+  const now=new Date()
+  const istOffset=5.5*60*60*1000
+  const nowIST=new Date(now.getTime()+istOffset)
+
+  // Next Sunday
+  const daysUntilSun=(7-nowIST.getUTCDay())%7||7
+  const nextSun=new Date(nowIST)
+  nextSun.setUTCDate(nowIST.getUTCDate()+daysUntilSun)
+  nextSun.setUTCHours(11,30,0,0) // 5pm IST
+
+  // If today is Sunday but before 5pm, use today
+  if(nowIST.getUTCDay()===0&&nowIST.getUTCHours()<11||(nowIST.getUTCHours()===11&&nowIST.getUTCMinutes()<30)){
+    nextSun.setUTCDate(nowIST.getUTCDate())
+  }
+
+  const diff=nextSun.getTime()-nowIST.getTime()
+  if(diff<=0){document.getElementById('countdownVal').textContent='Charts updating now! 🔥';return}
+
+  const d=Math.floor(diff/(1000*60*60*24))
+  const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60))
+  const m=Math.floor((diff%(1000*60*60))/(1000*60))
+  const s=Math.floor((diff%60000)/1000)
+
+  const parts=[]
+  if(d>0) parts.push(`${d}d`)
+  parts.push(`${String(h).padStart(2,'0')}h`)
+  parts.push(`${String(m).padStart(2,'0')}m`)
+  parts.push(`${String(s).padStart(2,'0')}s`)
+  document.getElementById('countdownVal').textContent=parts.join(' ')
+}
+setInterval(updateCountdown,1000)
+updateCountdown()
+
+
+function filterCat(cat,el){
+  currentFilter=cat
+  document.querySelectorAll('.cat-btn,.nav-links a').forEach(b=>b.classList.remove('active'))
+  if(el) el.classList.add('active')
+  renderReviews()
+}
+
+// ── LOCATION DETECT ───────────────────────────────────────────
+function detectLocation(){
+  const btn=document.querySelector('.loc-detect-btn')
+  const coordsEl=document.getElementById('locCoords')
+  if(!navigator.geolocation){showToast('Geolocation not supported on this browser','error');return}
+  btn.textContent='Detecting...'
+  btn.disabled=true
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      currentLat=pos.coords.latitude
+      currentLng=pos.coords.longitude
+      btn.textContent='✅ Got it!'
+      btn.disabled=false
+      coordsEl.textContent=`${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`
+      coordsEl.style.display='block'
+      // Pre-fill location text if empty
+      const locInput=document.getElementById('rLocation')
+      if(!locInput.value) locInput.value='Location attached (GPS)'
+      showToast('Location detected! 📍','success')
+    },
+    err=>{
+      btn.textContent='📍 Detect'
+      btn.disabled=false
+      const msgs={1:'Location permission denied',2:'Position unavailable',3:'Request timed out'}
+      showToast(msgs[err.code]||'Could not get location','error')
+    },
+    {timeout:10000,enableHighAccuracy:true}
+  )
+}
+
+// ── OPEN MAPS MODAL ───────────────────────────────────────────
+function openMaps(d, ev){
+  if(ev) ev.stopPropagation()
+  if(typeof d==='string') try{d=JSON.parse(d)}catch(e){d={}}
+
+  const locStr = d.loc||d.name||''
+  const hasCoords = d.lat && d.lng
+
+  document.getElementById('mapsModalDesc').textContent = locStr || 'Open in your preferred maps app'
+
+  if(hasCoords){
+    const lat=d.lat, lng=d.lng, q=encodeURIComponent(d.name||locStr)
+    document.getElementById('gmapsLink').href = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
+    document.getElementById('applemapsLink').href = `https://maps.apple.com/?ll=${lat},${lng}&q=${q}`
+    document.getElementById('wazeLink').href = `https://waze.com/ul?ll=${lat},${lng}&navigate=yes`
+  } else {
+    const q = encodeURIComponent(locStr||'SRM Institute Kattankulathur')
+    document.getElementById('gmapsLink').href = `https://www.google.com/maps/search/?api=1&query=${q}`
+    document.getElementById('applemapsLink').href = `https://maps.apple.com/?q=${q}`
+    document.getElementById('wazeLink').href = `https://waze.com/ul?q=${q}&navigate=yes`
+  }
+
+  document.getElementById('mapsModal').classList.add('open')
+}
+
+// ── OPEN REVIEW DETAIL ────────────────────────────────────────
+function openDetail(reviewId){
+  const r = allReviews.find(x=>x.id===reviewId)
+  if(!r) return
+
+  const stars='★'.repeat(r.rating)+'☆'.repeat(5-r.rating)
+  const date=new Date(r.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})
+  const uname=r.profiles?.username||r.username||'anon'
+  const tagMap={food:'tag-food',spot:'tag-spot',flat:'tag-flat',travel:'tag-travel'}
+  const catLabel={food:'🍜 Food',spot:'🗺️ Spot',flat:'🏠 Flat',travel:'🚌 Travel'}
+
+  // Aggregate
+  const agg={}
+  allReviews.filter(x=>x.title.trim().toLowerCase()===r.title.trim().toLowerCase()).forEach(x=>{
+    agg.total=(agg.total||0)+x.rating
+    agg.count=(agg.count||0)+1
+    agg.dist=agg.dist||{5:0,4:0,3:0,2:0,1:0}
+    agg.dist[x.rating]=(agg.dist[x.rating]||0)+1
+  })
+
+  const imgHtml = r.image_url ? `<img class="detail-img" src="${esc(r.image_url)}" alt="photo">` : ''
+
+  let locHtml = ''
+  if(r.location_name||r.lat){
+    const d={name:r.title,loc:r.location_name||'',lat:r.lat||null,lng:r.lng||null}
+    const ds=JSON.stringify(d).replace(/"/g,'&quot;')
+    locHtml=`<div class="detail-loc">
+      <div class="detail-loc-text">${esc(r.location_name||'GPS Location')}</div>
+      <div class="detail-maps-btns">
+        <button class="detail-map-btn google open-maps-btn" data-ds="${esc(ds)}">🗺️ Google</button>
+        <button class="detail-map-btn apple open-maps-btn" data-ds="${esc(ds)}">🍎 Apple</button>
+        <button class="detail-map-btn waze open-maps-btn" data-ds="${esc(ds)}">🚗 Waze</button>
+      </div>
+    </div>`
+  }
+
+  let aggHtml = ''
+  if(agg.count>=2){
+    const avg=(agg.total/agg.count).toFixed(1)
+    const bars=[5,4,3,2,1].map(n=>{
+      const pct=Math.round((agg.dist[n]||0)/agg.count*100)
+      return `<div class="bar-row"><span class="bar-label">${n}</span><div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div><span class="bar-num">${agg.dist[n]||0}</span></div>`
+    }).join('')
+    aggHtml=`<div class="detail-agg">
+      <div class="detail-agg-title">Overall Rating (${agg.count} reviews)</div>
+      <div class="agg-summary"><div class="agg-big-score">${avg}</div><div class="agg-right"><div class="agg-stars-row">${'★'.repeat(Math.round(agg.total/agg.count))}${'☆'.repeat(5-Math.round(agg.total/agg.count))}</div><div class="agg-count">${agg.count} total reviews</div></div></div>
+      ${bars}
+    </div>`
+  }
+
+  // Show delete button only if this review belongs to current user
+  const isOwner = currentUser && currentUser.id === r.user_id
+  const deleteHtml = isOwner ? `
+    <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border)">
+      <button id="deleteBtn_${r.id}" onclick="confirmDelete('${r.id}')"
+        style="background:transparent;border:1px solid rgba(255,61,139,.35);color:var(--neon-pink);font-family:'Familjen Grotesk',sans-serif;font-weight:700;font-size:.85rem;padding:.6rem 1.2rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.5rem"
+        onmouseover="this.style.background='rgba(255,61,139,.1)'" onmouseout="this.style.background='transparent'">
+        🗑️ Delete my review
+      </button>
+    </div>` : ''
+
+  document.getElementById('detailContent').innerHTML = `
+    ${imgHtml}
+    <div class="detail-body">
+      <div class="card-tag ${tagMap[r.category]}" style="margin-bottom:.75rem">${catLabel[r.category]}</div>
+      <div class="detail-header">
+        <div class="detail-title">${esc(r.title)}</div>
+        <div class="detail-stars">${stars}</div>
+      </div>
+      <div class="detail-meta">
+        <span class="detail-author">@${esc(uname)}</span>
+        <span class="detail-date">${date}</span>
+      </div>
+      <div class="detail-text">${esc(r.body)}</div>
+      ${locHtml}
+      ${aggHtml}
+      ${deleteHtml}
+    </div>`
+
+  document.getElementById('detailModal').classList.add('open')
+}
+
+// ── LOCATION SEARCH (Nominatim / OpenStreetMap - free) ────────
+let locSearchTimer = null
+async function searchLocation(query){
+  const resultsEl = document.getElementById('locResults')
+  if(!query||query.length<3){ resultsEl.style.display='none'; return }
+  clearTimeout(locSearchTimer)
+  locSearchTimer = setTimeout(async()=>{
+    try{
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query+' Kattankulathur Tamil Nadu')}&format=json&limit=5&addressdetails=1`)
+      const data = await res.json()
+      if(!data.length){
+        resultsEl.innerHTML='<div class="loc-result" style="color:var(--muted)">No results found</div>'
+        resultsEl.style.display='block'
+        return
+      }
+      resultsEl.innerHTML = data.map(p=>`
+        <div class="loc-result loc-result-item" data-name="${esc(p.display_name)}" data-lat="${p.lat}" data-lng="${p.lon}">
+          <span class="loc-result-icon">📍</span>
+          <span>${esc(p.display_name.split(',').slice(0,3).join(', '))}</span>
+        </div>`).join('')
+      resultsEl.style.display='block'
+    }catch(e){ resultsEl.style.display='none' }
+  }, 400)
+}
+
+function selectLocation(name, lat, lng){
+  document.getElementById('rLocation').value = name.split(',').slice(0,2).join(', ')
+  currentLat = parseFloat(lat)
+  currentLng = parseFloat(lng)
+  document.getElementById('locResults').style.display='none'
+  const coordsEl=document.getElementById('locCoords')
+  coordsEl.textContent=`${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`
+  coordsEl.style.display='block'
+  showToast('Location selected! 📍','success')
+}
+
+function checkGpsWarning() {
+  const cat = document.getElementById('rCategory').value;
+  const isDetect = document.getElementById('locTabDetect').classList.contains('active');
+  document.getElementById('gpsWarning').style.display = (cat === 'flat' && isDetect) ? 'block' : 'none';
+}
+document.getElementById('rCategory').addEventListener('change', checkGpsWarning);
+
+function switchLocTab(tab){
+  document.getElementById('locTabSearch').classList.toggle('active',tab==='search')
+  document.getElementById('locTabDetect').classList.toggle('active',tab==='detect')
+  document.getElementById('locSearchPane').style.display=tab==='search'?'block':'none'
+  document.getElementById('locDetectPane').style.display=tab==='detect'?'block':'none'
+  // clear coords when switching
+  currentLat=null; currentLng=null
+  document.getElementById('locCoords').style.display='none';
+  checkGpsWarning();
+}
+// ── LOCATION DETECT ───────────────────────────────────────────
+function detectLocation(){
+  const btn=document.querySelector('.loc-detect-btn')
+  const coordsEl=document.getElementById('locCoords')
+  if(!navigator.geolocation){showToast('Geolocation not supported on this browser','error');return}
+  btn.textContent='Detecting...'
+  btn.disabled=true
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      currentLat=pos.coords.latitude
+      currentLng=pos.coords.longitude
+      btn.textContent='✅ Got it!'
+      btn.disabled=false
+      const gpsInput=document.getElementById('rLocationGps')
+      if(gpsInput) gpsInput.value=`${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`
+      coordsEl.textContent=`${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`
+      coordsEl.style.display='block'
+      showToast('Location detected! 📍','success')
+    },
+    err=>{
+      btn.textContent='📍 Detect'
+      btn.disabled=false
+      const msgs={1:'Location permission denied — allow in browser settings',2:'Position unavailable',3:'Request timed out'}
+      showToast(msgs[err.code]||'Could not get location','error')
+    },
+    {timeout:10000,enableHighAccuracy:true}
+  )
+}
+// ── DELETE REVIEW ─────────────────────────────────────────────
+function confirmDelete(reviewId){
+  const btn = document.getElementById(`deleteBtn_${reviewId}`)
+  if(!btn) return
+  if(btn.dataset.confirming !== 'true'){
+    btn.dataset.confirming = 'true'
+    btn.innerHTML = '⚠️ Tap again to confirm'
+    btn.style.borderColor = 'var(--neon-yellow)'
+    btn.style.color = 'var(--neon-yellow)'
+    setTimeout(()=>{
+      if(btn.dataset.confirming==='true'){
+        btn.dataset.confirming='false'
+        btn.innerHTML='🗑️ Delete my review'
+        btn.style.borderColor='rgba(255,61,139,.35)'
+        btn.style.color='var(--neon-pink)'
+      }
+    }, 3000)
+    return
+  }
+  deleteReview(reviewId)
+}
+
+async function deleteReview(reviewId){
+  const btn = document.getElementById(`deleteBtn_${reviewId}`)
+  if(btn){ btn.disabled=true; btn.innerHTML='Deleting...' }
+  const {error} = await db.from('reviews').delete().eq('id', reviewId).eq('user_id', currentUser.id)
+  if(error){
+    showToast('Delete failed: ' + error.message, 'error')
+    if(btn){ btn.disabled=false; btn.innerHTML='🗑️ Delete my review'; btn.dataset.confirming='false' }
+  } else {
+    showToast('Review deleted 🗑️', 'success')
+    closeModal('detailModal')
+    await loadReviews()
+  }
+}
+
+function setRating(val){
+  currentRating=val
+  document.querySelectorAll('.star-btn').forEach((b,i)=>b.classList.toggle('active',i<val))
+}
+function previewImg(input){
+  const prev=document.getElementById('imgPreview')
+  if(input.files&&input.files[0]){
+    const reader=new FileReader()
+    reader.onload=e=>{prev.src=e.target.result;prev.style.display='block'}
+    reader.readAsDataURL(input.files[0])
+  }
+}
+function openAuth(){document.getElementById('authModal').classList.add('open')}
+function openReview(){document.getElementById('reviewModal').classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+function openAuthOrReview(){currentUser?openReview():openAuth()}
+function switchTab(tab){
+  document.getElementById('tabLogin').classList.toggle('active',tab==='login')
+  document.getElementById('tabSignup').classList.toggle('active',tab==='signup')
+  document.getElementById('loginPanel').classList.toggle('active',tab==='login')
+  document.getElementById('signupPanel').classList.toggle('active',tab==='signup')
+}
+function resetForm(){
+  document.getElementById('rTitle').value=''
+  document.getElementById('rBody').value=''
+  document.getElementById('rLocation').value=''
+  if(document.getElementById('rLocationGps')) document.getElementById('rLocationGps').value=''
+  document.getElementById('photoInput').value=''
+  document.getElementById('imgPreview').style.display='none'
+  document.getElementById('locCoords').style.display='none'
+  document.getElementById('locCoords').textContent=''
+  document.getElementById('locResults').style.display='none'
+  const detectBtn=document.querySelector('.loc-detect-btn')
+  if(detectBtn) detectBtn.textContent='📍 Detect'
+  switchLocTab('search')
+  currentRating=0
+  currentLat=null
+  currentLng=null
+  document.querySelectorAll('.star-btn').forEach(b=>b.classList.remove('active'))
+}
+function showToast(msg,type){
+  const t=document.getElementById('toast')
+  t.textContent=msg;t.className=`toast ${type} show`
+  setTimeout(()=>t.classList.remove('show'),3500)
+}
+function showErr(el,msg){el.textContent=msg;el.style.display='block'}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+
+// close modals on bg click
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}))
+
+// ── EVENT LISTENERS ─────────────────────────────────────────
+document.getElementById('locResults').addEventListener('click', e => {
+  const item = e.target.closest('.loc-result-item');
+  if(item) {
+    selectLocation(item.dataset.name, item.dataset.lat, item.dataset.lng);
+  }
+});
+document.addEventListener('click', e => {
+  const mapsBtn = e.target.closest('.open-maps-btn');
+  if(mapsBtn) {
+    e.preventDefault();
+    openMaps(mapsBtn.dataset.ds, e);
+  }
+});
+
+// ── BOOT ──────────────────────────────────────────────────────
+initAuth()
+loadReviews()
+</script>
+</body>
+</html>
