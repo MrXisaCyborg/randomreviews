@@ -265,7 +265,7 @@ h1 .l3 { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4); }
 .hero-desc { color: var(--muted); font-size: 1rem; line-height: 1.6; max-width: 480px; font-weight: 300; }
 .hero-desc strong { color: #fff; font-weight: 500; }
 .hero-actions { margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap; }
-.btn-pri {
+.btn-pri { width: 100%; text-align: center; 
   background: #fff; color: #000; border: none; padding: 1rem 2.2rem;
   font-weight: 700; font-size: 1rem; border-radius: 100px; cursor: pointer;
   transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(255,255,255,0.15);
@@ -557,7 +557,7 @@ footer { padding: 2rem 1.5rem; border-top: 1px solid var(--border); display: fle
   h1 { font-size: clamp(3rem, 5vw, 5rem); }
   .hero-desc { font-size: 1.1rem; }
   .hero-actions { gap: 1.25rem; }
-  .btn-pri, .btn-ghost-hero { width: auto; text-align: left; }
+  .btn-pri, .btn-ghost-hero { width: auto; text-align: center; }
   .hero-stats { gap: 3rem; margin-top: 4rem; flex-wrap: nowrap; }
   
   .feed-section { padding: 6rem 4rem; }
@@ -599,7 +599,7 @@ footer { padding: 2rem 1.5rem; border-top: 1px solid var(--border); display: fle
 <!-- NAV -->
 <nav>
   <div class="logo">Random<span>Reviews</span></div>
-  <button class="hamburger" onclick="document.querySelector('.nav-links').classList.toggle('active')">☰</button>
+  <button class="hamburger" onclick="toggleMenu(this)">☰</button>
   <ul class="nav-links">
     <li><a href="#" class="active" onclick="filterCat('all',this);return false">All</a></li>
     <li><a href="#" onclick="filterCat('food',this);return false">Food</a></li>
@@ -1640,6 +1640,27 @@ document.addEventListener('click', e => {
 // ── BOOT ──────────────────────────────────────────────────────
 initAuth()
 loadReviews()
+</script>
+
+<script>
+function toggleMenu(btn) {
+  const nav = document.querySelector('.nav-links');
+  nav.classList.toggle('active');
+  btn.textContent = nav.classList.contains('active') ? '✕' : '☰';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.nav-links a, .nav-right button').forEach(el => {
+    el.addEventListener('click', () => {
+      const nav = document.querySelector('.nav-links');
+      if (nav && nav.classList.contains('active')) {
+        nav.classList.remove('active');
+        const btn = document.querySelector('.hamburger');
+        if (btn) btn.textContent = '☰';
+      }
+    });
+  });
+});
 </script>
 </body>
 </html>
