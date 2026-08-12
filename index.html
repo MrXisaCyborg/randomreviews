@@ -226,7 +226,7 @@ nav {
   letter-spacing: 0.02em; transition: all 0.3s ease;
 }
 .nav-links a:hover, .nav-links a.active { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
-.nav-right { display: flex; gap: 1rem; align-items: center; }
+.nav-right { display: flex; gap: 1rem; align-items: center; flex-direction: column; width: 100%; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
 #userInfo { font-size: 0.8rem; color: var(--muted); font-family: 'Space Mono', monospace; }
 .nav-btn {
   background: #fff; color: #000; border: none; padding: 0.6rem 1.4rem;
@@ -280,8 +280,8 @@ h1 .l3 { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4); }
 .hero-stats { margin-top: 3rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
 .stat-num { font-family: 'Space Mono', monospace; font-size: 1.8rem; font-weight: 700; color: #fff; }
 .stat-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.4rem; font-weight: 500; }
-.hero-right { display: flex; position: relative; z-index: 2; align-items: center; justify-content: center; transform: scale(0.7); margin-top: -3rem; }
-.card-stack { position: relative; width: 340px; height: 480px; perspective: 1000px; }
+.hero-right { display: flex; position: relative; z-index: 2; align-items: center; justify-content: center; margin-top: 2rem; padding-bottom: 2rem; transform: scale(0.85); transform-origin: center top; }
+.card-stack { position: relative; width: 340px; max-width: 90vw; height: 480px; perspective: 1000px; }
 .review-card {
   position: absolute; background: var(--surface); border: 1px solid var(--border);
   backdrop-filter: var(--glass-blur); border-radius: 20px; padding: 1.5rem; width: 320px;
@@ -547,11 +547,12 @@ footer { padding: 2rem 1.5rem; border-top: 1px solid var(--border); display: fle
   nav { padding: 1.25rem 4rem; }
 
   .hamburger { display: none; }
-  .nav-links { display: flex; position: static; background: none; flex-direction: row; padding: 0; border: none; }
+  .nav-links { display: flex; position: static; background: none; flex-direction: row; padding: 0; border: none; align-items: center; }
+  .nav-right { flex-direction: row; width: auto; margin-top: 0; padding-top: 0; border-top: none; }
   .fab { display: none; }
   
   .hero { grid-template-columns: 1.1fr 0.9fr; min-height: 85vh; padding: 0 4rem; }
-  .hero-right { display: flex; transform: none; margin-top: 0; }
+  .hero-right { display: flex; transform: none; margin-top: 0; padding-bottom: 0; }
   .hero-left { padding-right: 2rem; padding-top: 0; padding-bottom: 0; padding-left: 0; }
   h1 { font-size: clamp(3rem, 5vw, 5rem); }
   .hero-desc { font-size: 1.1rem; }
@@ -598,6 +599,7 @@ footer { padding: 2rem 1.5rem; border-top: 1px solid var(--border); display: fle
 <!-- NAV -->
 <nav>
   <div class="logo">Random<span>Reviews</span></div>
+  <button class="hamburger" onclick="document.querySelector('.nav-links').classList.toggle('active')">☰</button>
   <ul class="nav-links">
     <li><a href="#" class="active" onclick="filterCat('all',this);return false">All</a></li>
     <li><a href="#" onclick="filterCat('food',this);return false">Food</a></li>
@@ -605,13 +607,14 @@ footer { padding: 2rem 1.5rem; border-top: 1px solid var(--border); display: fle
     <li><a href="#" onclick="filterCat('flat',this);return false">Flats</a></li>
     <li><a href="#" onclick="filterCat('travel',this);return false">Travel</a></li>
     <li><a href="#" onclick="document.getElementById('chartsSection').scrollIntoView({behavior:'smooth'});return false">🏆 Charts</a></li>
-  </ul>
-  <div class="nav-right">
+  <li class="nav-right">
     <button class="nav-btn ghost" id="userInfo" style="display:none" onclick="openProfile()">Profile</button>
     <button class="nav-btn ghost" id="loginBtn" onclick="openAuth()">Login</button>
     <button class="nav-btn" id="reviewBtn" style="display:none" onclick="openReview()">+ Drop Review</button>
     <button class="nav-btn danger" id="logoutBtn" style="display:none" onclick="doLogout()">Logout</button>
-  </div>
+  </li>
+  </ul>
+  
 </nav>
 
 <!-- HERO -->
