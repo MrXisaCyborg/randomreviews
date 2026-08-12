@@ -6,7 +6,8 @@
 <title>Random Reviews — SRM's Unfiltered Guide</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0a0f'/%3E%3Crect width='64' height='64' rx='14' fill='%23f5e642' opacity='0.12'/%3E%3Ctext x='50%25' y='54%25' font-size='38' text-anchor='middle' dominant-baseline='middle' font-family='serif'%3E⭐%3C/text%3E%3Ctext x='50%25' y='88%25' font-size='10' text-anchor='middle' font-family='monospace' fill='%23f5e642' font-weight='bold'%3ERR%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
+<script>
 // ── SORTING ───────────────────────────────────────────────────
 function handleSortChange(){
   currentSort = document.getElementById('sortSelect').value;
@@ -504,7 +505,7 @@ footer { padding: 3rem 4rem; border-top: 1px solid var(--border); display: flex;
 /* ── MOBILE ─────────────────────────────────────────────────── */
 @media(max-width: 768px) {
   nav { padding: 1rem 1.25rem; }
-  .nav-links, .nav-right, #userInfo { display: none; }
+  .nav-links { display: none; }
   .fab { display: flex; align-items: center; justify-content: center; }
   
   .hero { grid-template-columns: 1fr; min-height: auto; padding: 0; }
@@ -605,11 +606,8 @@ footer { padding: 3rem 4rem; border-top: 1px solid var(--border); display: flex;
   <div class="hero-left">
     <div class="badge">SRM Students Only 🔥</div>
     <h1>No BS.<br><span class="l2">Real Reviews.</span><br><span class="l3">By SRMites.</span></h1>
-    <p class="hero-desc">The raw, unfiltered truth your seniors gatekept — <strong>everything you need to know,</strong> now in one place.</p>
-    <div class="notify-wrap">
-      <input type="email" id="notifyEmail" class="notify-input" placeholder="Join the waitlist...">
-      <button class="notify-btn" onclick="submitNotifyMe()">Notify Me</button>
-    </div>
+    <p class="hero-desc">everything your senior wouldn't tell you, something better</p>
+    
     <div class="hero-actions">
       <button class="btn-pri" onclick="document.getElementById('feedSection').scrollIntoView({behavior:'smooth'})">Start Exploring →</button>
       <button class="btn-ghost-hero" onclick="openAuthOrReview()">Drop a Review</button>
@@ -688,13 +686,6 @@ create policy "Own delete" on reviews for delete using (auth.uid() = user_id);
 create table if not exists profiles (
   id uuid references auth.users(id) primary key,
   username text unique not null,
-  created_at timestamptz default now()
-);
-
--- WAITLIST TABLE
-create table if not exists waitlist (
-  id uuid default gen_random_uuid() primary key,
-  email text unique not null,
   created_at timestamptz default now()
 );
 
@@ -1393,9 +1384,9 @@ function openDetail(reviewId){
     locHtml=`<div class="detail-loc">
       <div class="detail-loc-text">${esc(r.location_name||'GPS Location')}</div>
       <div class="detail-maps-btns">
-        <button class="detail-map-btn google open-maps-btn" data-ds="${esc(ds)}">🗺️ Google</button>
-        <button class="detail-map-btn apple open-maps-btn" data-ds="${esc(ds)}">🍎 Apple</button>
-        <button class="detail-map-btn waze open-maps-btn" data-ds="${esc(ds)}">🚗 Waze</button>
+        <button class="detail-map-btn google open-maps-btn" data-ds="${esc(ds)}"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROYfgz8DCCHphqgVkivbGw5_bPU3Jq6dxHC8JRxJsYnA&s=10" alt="G" style="width:16px;height:16px;border-radius:4px"> Google</button>
+        <button class="detail-map-btn apple open-maps-btn" data-ds="${esc(ds)}"><img src="https://banner2.cleanpng.com/20180713/qgf/kisspng-apple-logo-computer-icons-symbol-nike-inc-5b4908cd8f2049.1665534815315130375863.jpg" alt="A" style="width:16px;height:16px;border-radius:4px"> Apple</button>
+        
       </div>
     </div>`
   }
