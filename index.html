@@ -776,6 +776,8 @@ create policy "Enforce image limits" on storage.objects for insert to authentica
 -- SUPPORT FEATURE
 alter table reviews add column if not exists support_count int default 0;
 
+update reviews set support_count = 0 where support_count is null;
+
 create table if not exists review_supports (
   review_id uuid references reviews(id) on delete cascade,
   user_id uuid references auth.users(id) on delete cascade,
@@ -800,10 +802,10 @@ begin
   select exists(select 1 from review_supports where review_id = p_review_id and user_id = p_user_id) into v_exists;
   if v_exists then
     delete from review_supports where review_id = p_review_id and user_id = p_user_id;
-    update reviews set support_count = support_count - 1 where id = p_review_id returning support_count into v_new_count;
+    update reviews set support_count = greatest(coalesce(support_count, 0) - 1, 0) where id = p_review_id returning support_count into v_new_count;
   else
     insert into review_supports (review_id, user_id) values (p_review_id, p_user_id);
-    update reviews set support_count = support_count + 1 where id = p_review_id returning support_count into v_new_count;
+    update reviews set support_count = coalesce(support_count, 0) + 1 where id = p_review_id returning support_count into v_new_count;
   end if;
   return v_new_count;
 end;
