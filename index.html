@@ -178,6 +178,8 @@ body {
   font-family: 'Plus Jakarta Sans', sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 /* AURORA BACKGROUND */
@@ -328,8 +330,8 @@ h1 .l3 { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4); }
 .section-title { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 2.5rem; }
 .cat-filter { display: flex; gap: 0.5rem; margin-bottom: 3rem; flex-wrap: wrap; }
 .cat-btn {
-  background: var(--surface); border: 1px solid var(--border); color: var(--muted);
-  padding: 0.5rem 1rem; font-weight: 600; font-size: 0.75rem; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--border); color: rgba(255, 255, 255, 0.8);
+  padding: 0.7rem 1.4rem; font-weight: 600; font-size: 0.9rem; cursor: pointer;
   border-radius: 100px; transition: all 0.3s ease; backdrop-filter: var(--glass-blur);
 }
 .cat-btn:hover { background: var(--surface-hover); color: #fff; }
@@ -337,6 +339,12 @@ h1 .l3 { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4); }
 .reviews-grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 1.25rem; padding-bottom: 1rem; scrollbar-width: none; }
 .reviews-grid::-webkit-scrollbar { display: none; }
 .reviews-grid .r-card { min-width: 300px; max-width: 85vw; scroll-snap-align: center; flex-shrink: 0; }
+.feed-carousel-wrapper { position: relative; width: 100%; }
+.feed-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(20, 20, 28, 0.7); border: 1px solid var(--border); color: #fff; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+.feed-arrow:hover { background: var(--neon-pink); border-color: var(--neon-pink); color: #fff; }
+.feed-arrow.left { left: 1rem; }
+.feed-arrow.right { right: 1rem; }
+@media (max-width: 768px) { .feed-arrow { display: none; } }
 .r-card {
   background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
   padding: 1.75rem; transition: all 0.3s ease; position: relative; overflow: hidden;
@@ -349,8 +357,8 @@ h1 .l3 { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4); }
 }
 .r-card:hover { transform: translateY(-5px); border-color: var(--border-hover); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
 .r-card img { width: calc(100% + 3.5rem); margin: -1.75rem -1.75rem 1.25rem -1.75rem; height: 180px; object-fit: cover; border-radius: 20px 20px 0 0; }
-.r-card-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 1.15rem; margin-bottom: 0.6rem; line-height: 1.3; }
-.r-card-body { font-size: 0.9rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-weight: 300; flex: 1; }
+.r-card-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 1.25rem; margin-bottom: 0.6rem; line-height: 1.35; color: #fff; }
+.r-card-body { font-size: 1rem; color: rgba(255, 255, 255, 0.75); line-height: 1.65; margin-bottom: 1.5rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-weight: 400; flex: 1; }
 .r-card-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-top: auto; }
 .r-card-author { font-size: 0.75rem; color: var(--muted); font-family: 'Space Mono', monospace; }
 .r-card-location { font-size: 0.8rem; color: var(--text); margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 500; }
@@ -566,8 +574,8 @@ footer { padding: 2rem 1.5rem; border-top: 1px solid var(--border); display: fle
   
   .feed-section { padding: 6rem 4rem; }
   .section-title { font-size: clamp(2rem, 3.5vw, 3rem); }
-  .cat-filter { gap: 0.75rem; }
-  .cat-btn { padding: 0.6rem 1.25rem; font-size: 0.85rem; }
+  .cat-filter { gap: 1rem; }
+  .cat-btn { padding: 0.8rem 1.6rem; font-size: 1rem; }
   .reviews-grid { gap: 2rem; }
   .reviews-grid .r-card { min-width: 350px; }
   
@@ -782,8 +790,16 @@ create policy "Enforce image limits" on storage.objects for insert to authentica
       <option value="lowest">Lowest Rated</option>
     </select>
   </div>
-  <div id="reviewsGrid" class="reviews-grid">
-    <div class="state-box">Loading reviews...</div>
+  <div class="feed-carousel-wrapper">
+    <button class="feed-arrow left" onclick="scrollFeed(-1)" aria-label="Previous">
+      <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div id="reviewsGrid" class="reviews-grid">
+      <div class="state-box">Loading reviews...</div>
+    </div>
+    <button class="feed-arrow right" onclick="scrollFeed(1)" aria-label="Next">
+      <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
   </div>
 </section>
 
@@ -1189,6 +1205,14 @@ function renderReviews(){
 
     return `<div class="r-card ${r.category} animate-in" onclick="openDetail('${r.id}')" style="cursor:pointer; animation-delay: ${delay}s;">${sampleBadge}${img}<div class="card-tag ${tagMap[r.category]}">${catLabel[r.category]}</div><div class="r-card-title">${esc(r.title)}</div><div class="r-card-body">${esc(r.body)}</div>${locHtml}${aggHtml}<div class="r-card-meta" style="margin-top:.75rem"><span class="stars">${stars}</span><span class="r-card-author">@${esc(uname)} · ${date}</span></div></div>`
   }).join('')
+}
+
+// ── SCROLL FEED ───────────────────────────────────────────────
+function scrollFeed(dir) {
+  const grid = document.getElementById('reviewsGrid');
+  if(!grid) return;
+  const cardWidth = 350 + 32; // card min-width + approx gap (2rem)
+  grid.scrollBy({ left: dir * cardWidth, behavior: 'smooth' });
 }
 
 // ── TICKER ────────────────────────────────────────────────────
