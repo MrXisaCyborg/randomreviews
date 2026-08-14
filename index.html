@@ -1,20 +1,20 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Random Reviews — SRM's Unfiltered Guide</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0a0f'/%3E%3Crect width='64' height='64' rx='14' fill='%23f5e642' opacity='0.12'/%3E%3Ctext x='50%25' y='54%25' font-size='38' text-anchor='middle' dominant-baseline='middle' font-family='serif'%3E⭐%3C/text%3E%3Ctext x='50%25' y='88%25' font-size='10' text-anchor='middle' font-family='monospace' fill='%23f5e642' font-weight='bold'%3ERR%3C/text%3E%3C/svg%3E">
+<title>Random Reviews â€” SRM's Unfiltered Guide</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0a0f'/%3E%3Crect width='64' height='64' rx='14' fill='%23f5e642' opacity='0.12'/%3E%3Ctext x='50%25' y='54%25' font-size='38' text-anchor='middle' dominant-baseline='middle' font-family='serif'%3Eâ­%3C/text%3E%3Ctext x='50%25' y='88%25' font-size='10' text-anchor='middle' font-family='monospace' fill='%23f5e642' font-weight='bold'%3ERR%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
 <script>
-// ── SORTING ───────────────────────────────────────────────────
+// â”€â”€ SORTING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function handleSortChange(){
   currentSort = document.getElementById('sortSelect').value;
   renderReviews();
 }
 
-// ── PROFILE ───────────────────────────────────────────────────
+// â”€â”€ PROFILE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function openProfile(){
   if(!currentUser) return;
   document.getElementById('profileEmail').textContent = currentUser.email;
@@ -40,7 +40,7 @@ function renderProfileReviews(){
   }
   
   container.innerHTML = userReviews.map(r => {
-    const stars = '★'.repeat(r.rating) + '☆'.repeat(5-r.rating);
+    const stars = 'â˜…'.repeat(r.rating) + 'â˜†'.repeat(5-r.rating);
     const date = new Date(r.created_at).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'});
     const imgHtml = r.image_url ? '<img class="profile-review-img" src="' + esc(r.image_url) + '" alt="img">' : '';
     
@@ -48,9 +48,9 @@ function renderProfileReviews(){
         imgHtml +
         '<div class="profile-review-content">' +
           '<div class="profile-review-title">' + esc(r.title) + '</div>' +
-          '<div class="profile-review-meta">' + stars + ' · ' + date + '</div>' +
+          '<div class="profile-review-meta">' + stars + ' Â· ' + date + '</div>' +
           '<div style="font-size:0.85rem; color:var(--text); margin-bottom:0.75rem; font-weight:300;">' + esc(r.body) + '</div>' +
-          '<button class="profile-delete-btn" id="profDelBtn_' + r.id + '" onclick="confirmDeleteProfile(\'' + r.id + '\')">🗑️ Delete</button>' +
+          '<button class="profile-delete-btn" id="profDelBtn_' + r.id + '" onclick="confirmDeleteProfile(\'' + r.id + '\')">Delete</button>' +
         '</div>' +
       '</div>';
   }).join('');
@@ -62,13 +62,13 @@ function confirmDeleteProfile(id){
     deleteReviewProfile(id);
   } else {
     btn.dataset.confirm = 'true';
-    btn.textContent = '⚠️ Confirm Delete';
+    btn.textContent = 'âš ï¸ Confirm Delete';
     btn.style.color = 'var(--neon-yellow)';
     btn.style.borderColor = 'var(--neon-yellow)';
     setTimeout(() => {
       if(btn.dataset.confirm === 'true'){
         btn.dataset.confirm = 'false';
-        btn.textContent = '🗑️ Delete';
+        btn.textContent = 'Delete';
         btn.style.color = 'var(--neon-pink)';
         btn.style.borderColor = 'rgba(255,61,139,0.2)';
       }
@@ -83,7 +83,7 @@ async function deleteReviewProfile(id){
   const {error} = await db.from('reviews').delete().eq('id', id).eq('user_id', currentUser.id);
   if(error){
     showToast('Failed to delete: ' + error.message, 'error');
-    btn.disabled = false; btn.textContent = '🗑️ Delete';
+    btn.disabled = false; btn.textContent = 'Delete';
   } else {
     showToast('Review deleted!', 'success');
     allReviews = allReviews.filter(r => r.id !== id);
@@ -94,7 +94,7 @@ async function deleteReviewProfile(id){
   }
 }
 
-// ── WAITLIST / NOTIFY ME ──────────────────────────────────────
+// â”€â”€ WAITLIST / NOTIFY ME â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function submitNotifyMe(){
   const email = document.getElementById('notifyEmail').value.trim();
   const btn = document.querySelector('.notify-btn');
@@ -107,21 +107,21 @@ async function submitNotifyMe(){
   
   if(error){
     if(error.message.includes('unique constraint') || error.message.includes('duplicate key value')) {
-      showToast('You are already on the waitlist! 🎉', 'success');
+      showToast('You are already on the waitlist! ðŸŽ‰', 'success');
       document.getElementById('notifyEmail').value = '';
     } else {
       showToast('Error joining waitlist: ' + error.message, 'error');
     }
     btn.disabled = false; btn.textContent = 'Notify Me';
   } else {
-    showToast('You are on the waitlist! 🚀', 'success');
+    showToast('You are on the waitlist! ðŸš€', 'success');
     document.getElementById('notifyEmail').value = '';
     btn.textContent = 'Joined!';
     setTimeout(() => { btn.disabled = false; btn.textContent = 'Notify Me'; }, 3000);
   }
 }
 
-// ── INTERACTIVE CARDS ─────────────────────────────────────────
+// â”€â”€ INTERACTIVE CARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 document.addEventListener('DOMContentLoaded', () => {
   const stack = document.querySelector('.card-stack');
   if(stack){
@@ -261,7 +261,7 @@ nav {
 .badge::before { content: ''; width: 6px; height: 6px; background: #3ecf8e; border-radius: 50%; box-shadow: 0 0 10px #3ecf8e; }
 h1 { font-size: clamp(2.5rem, 10vw, 3.5rem); font-weight: 800; line-height: 1.05; letter-spacing: -0.03em; margin-bottom: 1.5rem; }
 h1 .l2 { background: linear-gradient(135deg, #fff 0%, #a0a0a0 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-h1 .l3 { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4); }
+h1 .l3 { color: #fff; opacity: 0.45; }
 .hero-desc { color: var(--muted); font-size: 1rem; line-height: 1.6; max-width: 480px; font-weight: 300; }
 .hero-desc strong { color: #fff; font-weight: 500; }
 .hero-actions { margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap; }
@@ -334,7 +334,9 @@ h1 .l3 { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4); }
 }
 .cat-btn:hover { background: var(--surface-hover); color: #fff; }
 .cat-btn.active { background: #fff; color: #000; border-color: #fff; box-shadow: 0 4px 15px rgba(255,255,255,0.15); }
-.reviews-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+.reviews-grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 1.25rem; padding-bottom: 1rem; scrollbar-width: none; }
+.reviews-grid::-webkit-scrollbar { display: none; }
+.reviews-grid .r-card { min-width: 300px; max-width: 85vw; scroll-snap-align: center; flex-shrink: 0; }
 .r-card {
   background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
   padding: 1.75rem; transition: all 0.3s ease; position: relative; overflow: hidden;
@@ -346,7 +348,7 @@ h1 .l3 { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4); }
   pointer-events: none;
 }
 .r-card:hover { transform: translateY(-5px); border-color: var(--border-hover); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
-.r-card img { width: 100%; height: 180px; object-fit: cover; margin-bottom: 1.25rem; border-radius: 12px; }
+.r-card img { width: calc(100% + 3.5rem); margin: -1.75rem -1.75rem 1.25rem -1.75rem; height: 180px; object-fit: cover; border-radius: 20px 20px 0 0; }
 .r-card-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 1.15rem; margin-bottom: 0.6rem; line-height: 1.3; }
 .r-card-body { font-size: 0.9rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-weight: 300; flex: 1; }
 .r-card-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-top: auto; }
@@ -365,8 +367,9 @@ h1 .l3 { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4); }
 /* MODALS */
 .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); z-index: 800; display: none; align-items: flex-end; justify-content: center; padding: 0; }
 .overlay.open { display: flex; }
-.modal { background: rgba(15,15,20,0.85); border: 1px solid var(--border); border-bottom: none; border-radius: 24px 24px 0 0; padding: 2rem 1.5rem; width: 100%; max-width: 100%; position: relative; max-height: 95vh; overflow-y: auto; box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1); animation: fadeScale 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+.modal { background: rgba(15,15,20,0.95); border: 1px solid var(--border); border-bottom: none; border-radius: 24px 24px 0 0; padding: 2rem 1.5rem 3rem; width: 100%; max-width: 100%; position: relative; max-height: 92vh; overflow-y: auto; box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1); animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
 @keyframes fadeScale { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(60px); } to { opacity: 1; transform: translateY(0); } }
 .modal h2 { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
 .modal-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; font-weight: 300; }
 .modal-close { position: absolute; top: 1.5rem; right: 1.5rem; background: var(--surface); border: 1px solid var(--border); color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; }
@@ -414,7 +417,193 @@ footer { padding: 2rem 1.5rem; border-top: 1px solid var(--border); display: fle
 .maps-btn svg { width: 14px; height: 14px; fill: currentColor; }
 
 /* MAPS PICKER MODAL */
-.maps-modal { background: rgba(15,15,20,0.85); border: 1px solid var(--border); border-radius: 24px; padding: 2.5rem; width: 100%; max-width: 400px; position: relative; animation: fadeScale 0.3s ease; backdrop-filter: var(--glass-blur); }
+.maps-modal { background: rgba(15,15,20,0.95); border: 1px solid var(--border); border-radius: 24px 24px 0 0; border-bottom: none; padding: 2rem 1.5rem 3rem; width: 100%; max-width: 100%; position: relative; animation: slideUp 0.35s cubic-bezier(0.16,1,0.3,1); backdrop-filter: var(--glass-blur); }
+.maps-modal h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; }
+.maps-modal p { font-size: 0.9rem; color: var(--muted); margin-bottom: 2rem; font-weight: 300; }
+.maps-options { display: flex; flex-direction: column; gap: 1rem; }
+.map-option { display: flex; align-items: center; gap: 1.25rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem; cursor: pointer; text-decoration: none; color: #fff; transition: all 0.2s; }
+.map-option:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+.map-option-icon { font-size: 1.75rem; }
+.map-option-label { font-weight: 600; font-size: 1rem; }
+.map-option-sub { font-size: 0.8rem; color: var(--muted); margin-top: 0.2rem; font-weight: 300; }
+
+/* LOCATION ATTACH in form */
+.loc-attach { display: flex; gap: 0.75rem; align-items: flex-start; }
+.loc-attach input { flex: 1; }
+.loc-detect-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; padding: 0.85rem 1.25rem; border-radius: 12px; font-size: 0.9rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; font-weight: 600; }
+.loc-detect-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); }
+.loc-coords { font-size: 0.75rem; color: #3ecf8e; font-family: 'Space Mono', monospace; margin-top: 0.5rem; display: none; }
+
+/* AGGREGATE RATING on cards */
+.agg-bar-wrap { margin-top: 1.25rem; border-top: 1px solid var(--border); padding-top: 1.25rem; }
+.agg-summary { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+.agg-big-score { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 2rem; font-weight: 800; color: #fff; line-height: 1; }
+.agg-right { flex: 1; }
+.agg-stars-row { color: #fff; font-size: 0.9rem; letter-spacing: 2px; }
+.agg-count { font-size: 0.75rem; color: var(--muted); margin-top: 0.25rem; font-weight: 500; }
+.bar-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.4rem; }
+.bar-label { font-size: 0.7rem; color: var(--muted); font-weight: 600; width: 10px; text-align: right; flex-shrink: 0; }
+.bar-track { flex: 1; height: 6px; background: rgba(255,255,255,0.05); border-radius: 100px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 100px; background: #fff; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.bar-num { font-size: 0.7rem; color: var(--muted); width: 20px; font-weight: 500; flex-shrink: 0; }
+
+/* WEEKLY TOP CHARTS */
+.charts-section { padding: 4rem 1.5rem; position: relative; z-index: 2; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2); }
+.charts-header { display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem; }
+.charts-title-block .section-label { margin-bottom: 0.75rem; }
+.charts-countdown { font-weight: 500; font-size: 0.85rem; color: var(--muted); text-align: left; }
+.countdown-val { color: #fff; font-weight: 700; font-family: 'Space Mono', monospace; font-size: 1rem; display: block; margin-top: 0.25rem; }
+.charts-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 1.75rem; position: relative; overflow: hidden; backdrop-filter: var(--glass-blur); }
+.chart-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 4px 4px 0 0; }
+.chart-card.food::before { background: var(--c-food); }
+.chart-card.spot::before { background: var(--c-spot); }
+.chart-card.flat::before { background: var(--c-flat); }
+.chart-card.travel::before { background: var(--c-travel); }
+.chart-cat-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+.chart-podium { display: flex; flex-direction: column; gap: 0.75rem; }
+.chart-item { display: flex; align-items: center; gap: 1rem; padding: 0.6rem 0.8rem; border-radius: 12px; transition: background 0.2s; }
+.chart-item:hover { background: rgba(255,255,255,0.05); }
+.chart-rank { font-weight: 800; font-size: 0.9rem; width: 24px; flex-shrink: 0; text-align: center; }
+.chart-rank.r1 { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+.chart-rank.r2 { color: #ccc; }
+.chart-rank.r3 { color: #b87333; }
+.chart-rank.rn { color: var(--muted); font-weight: 500; font-size: 0.8rem; }
+.chart-name { flex: 1; font-size: 0.95rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chart-score { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: #fff; font-weight: 700; flex-shrink: 0; }
+.chart-empty { color: var(--muted); font-size: 0.9rem; text-align: center; padding: 2rem 0; font-weight: 300; }
+.charts-updated { text-align: center; margin-top: 3rem; font-size: 0.8rem; color: var(--muted); font-weight: 400; }
+.charts-updated span { color: #fff; font-weight: 500; }
+/* Desktop absolute positioning is applied inside media query */
+@keyframes float1 { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-10px) rotate(-1deg); } }
+@keyframes float2 { 0%, 100% { transform: translateY(0) scale(0.95) rotate(2deg); } 50% { transform: translateY(-15px) scale(0.95) rotate(3deg); } }
+@keyframes float3 { 0%, 100% { transform: translateY(0) scale(0.9) rotate(-1deg); } 50% { transform: translateY(-8px) scale(0.9) rotate(-2deg); } }
+@keyframes float4 { 0%, 100% { transform: translateY(0) scale(0.85) rotate(2deg); } 50% { transform: translateY(-12px) scale(0.85) rotate(1deg); } }
+@keyframes float5 { 0%, 100% { transform: translateY(0) scale(0.8) rotate(-2deg); } 50% { transform: translateY(-10px) scale(0.8) rotate(-3deg); } }
+
+.card-tag {
+  font-size: 0.65rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+  padding: 0.3rem 0.7rem; width: fit-content; margin-bottom: 0.8rem; border-radius: 100px;
+}
+.tag-food { background: rgba(255,158,122,0.15); color: var(--c-food); border: 1px solid rgba(255,158,122,0.2); }
+.tag-spot { background: rgba(99,212,255,0.15); color: var(--c-spot); border: 1px solid rgba(99,212,255,0.2); }
+.tag-flat { background: rgba(255,122,184,0.15); color: var(--c-flat); border: 1px solid rgba(255,122,184,0.2); }
+.tag-travel { background: rgba(255,209,102,0.15); color: var(--c-travel); border: 1px solid rgba(255,209,102,0.2); }
+.card-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 1.05rem; margin-bottom: 0.5rem; line-height: 1.3; }
+.card-body { font-size: 0.85rem; color: var(--muted); line-height: 1.6; font-weight: 300; }
+.card-footer { margin-top: 1rem; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 1rem; }
+.stars { color: #fff; font-size: 0.85rem; letter-spacing: 2px; }
+.card-author { font-size: 0.7rem; color: var(--muted); font-family: 'Space Mono', monospace; }
+.card-img-ph {
+  width: 100%; height: 120px; background: rgba(255,255,255,0.02); border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 1rem;
+}
+
+/* TICKER */
+.ticker-wrap { padding: 1.5rem 0; overflow: hidden; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: rgba(10,10,15,0.3); backdrop-filter: var(--glass-blur); }
+.ticker-label { text-align: center; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.75rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem; font-weight: 700; }
+.ticker-track { display: flex; gap: 2rem; width: max-content; animation: ticker 30s linear infinite; }
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.ti { font-size: 0.85rem; display: flex; gap: 0.75rem; align-items: center; color: #fff; font-weight: 500; }
+.ti-star { color: rgba(255,255,255,0.8); }
+.ti-name { color: var(--muted); font-size: 0.75rem; font-family: 'Space Mono', monospace; }
+
+/* FEED */
+.feed-section { padding: 4rem 1.5rem; position: relative; z-index: 2; }
+.section-label { font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--muted); text-transform: uppercase; margin-bottom: 1rem; }
+.section-title { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 2.5rem; }
+.cat-filter { display: flex; gap: 0.5rem; margin-bottom: 3rem; flex-wrap: wrap; }
+.cat-btn {
+  background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+  padding: 0.5rem 1rem; font-weight: 600; font-size: 0.75rem; cursor: pointer;
+  border-radius: 100px; transition: all 0.3s ease; backdrop-filter: var(--glass-blur);
+}
+.cat-btn:hover { background: var(--surface-hover); color: #fff; }
+.cat-btn.active { background: #fff; color: #000; border-color: #fff; box-shadow: 0 4px 15px rgba(255,255,255,0.15); }
+.reviews-grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 1.25rem; padding-bottom: 1rem; scrollbar-width: none; }
+.reviews-grid::-webkit-scrollbar { display: none; }
+.reviews-grid .r-card { min-width: 300px; max-width: 85vw; scroll-snap-align: center; flex-shrink: 0; }
+.r-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+  padding: 1.75rem; transition: all 0.3s ease; position: relative; overflow: hidden;
+  backdrop-filter: var(--glass-blur); display: flex; flex-direction: column;
+}
+.r-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 100%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+  pointer-events: none;
+}
+.r-card:hover { transform: translateY(-5px); border-color: var(--border-hover); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+.r-card img { width: calc(100% + 3.5rem); margin: -1.75rem -1.75rem 1.25rem -1.75rem; height: 180px; object-fit: cover; border-radius: 20px 20px 0 0; }
+.r-card-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 1.15rem; margin-bottom: 0.6rem; line-height: 1.3; }
+.r-card-body { font-size: 0.9rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-weight: 300; flex: 1; }
+.r-card-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-top: auto; }
+.r-card-author { font-size: 0.75rem; color: var(--muted); font-family: 'Space Mono', monospace; }
+.r-card-location { font-size: 0.8rem; color: var(--text); margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 500; }
+.state-box { text-align: center; padding: 5rem 2rem; color: var(--muted); font-weight: 500; font-size: 1rem; background: var(--surface); border-radius: 20px; border: 1px solid var(--border); backdrop-filter: var(--glass-blur); }
+.empty-state { grid-column: 1/-1; text-align: center; padding: 5rem 2rem; border: 1px dashed var(--border); border-radius: 20px; color: var(--muted); }
+.empty-state .icon { font-size: 3.5rem; margin-bottom: 1.5rem; opacity: 0.5; }
+
+/* SQL PANEL */
+.sql-panel { background: rgba(255,61,139,0.05); border: 1px solid rgba(255,61,139,0.2); border-radius: 16px; padding: 1.5rem; margin: 0 1.5rem 2rem; backdrop-filter: var(--glass-blur); }
+.sql-panel h3 { color: #fff; font-size: 1rem; font-family: 'Plus Jakarta Sans', sans-serif; margin-bottom: 1rem; }
+.sql-panel pre { background: rgba(0,0,0,0.4); padding: 1.5rem; font-size: 0.75rem; color: var(--muted); overflow-x: auto; border-radius: 8px; line-height: 1.6; font-family: 'Space Mono', monospace; }
+.sql-panel p { font-size: 0.85rem; color: var(--muted); margin-top: 1rem; }
+
+/* MODALS */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); z-index: 800; display: none; align-items: flex-end; justify-content: center; padding: 0; }
+.overlay.open { display: flex; }
+.modal { background: rgba(15,15,20,0.95); border: 1px solid var(--border); border-bottom: none; border-radius: 24px 24px 0 0; padding: 2rem 1.5rem 3rem; width: 100%; max-width: 100%; position: relative; max-height: 92vh; overflow-y: auto; box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1); animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes fadeScale { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(60px); } to { opacity: 1; transform: translateY(0); } }
+.modal h2 { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+.modal-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; font-weight: 300; }
+.modal-close { position: absolute; top: 1.5rem; right: 1.5rem; background: var(--surface); border: 1px solid var(--border); color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; }
+.modal-close:hover { background: #fff; color: #000; }
+.modal-tabs { display: flex; gap: 1rem; border-bottom: 1px solid var(--border); margin-bottom: 2rem; padding-bottom: 1rem; }
+.modal-tab { background: none; border: none; color: var(--muted); font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; padding: 0.5rem 0; position: relative; }
+.modal-tab.active { color: #fff; }
+.modal-tab.active::after { content: ''; position: absolute; bottom: -1rem; left: 0; right: 0; height: 2px; background: #fff; border-radius: 2px; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.fg { margin-bottom: 1.5rem; }
+.fg label { display: block; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 0.6rem; }
+.fg input, .fg textarea, .fg select { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 0.85rem 1rem; border-radius: 12px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.95rem; transition: all 0.2s; }
+.fg input:focus, .fg textarea:focus, .fg select:focus { outline: none; border-color: rgba(255,255,255,0.4); background: rgba(0,0,0,0.5); box-shadow: 0 0 0 3px rgba(255,255,255,0.05); }
+.fg textarea { resize: vertical; min-height: 120px; }
+.fg select { cursor: pointer; }
+.fg select option { background: #13131a; color: #fff; }
+.star-rating { display: flex; gap: 0.5rem; }
+.star-btn { background: none; border: none; font-size: 1.75rem; cursor: pointer; color: rgba(255,255,255,0.1); transition: all 0.2s; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+.star-btn:hover, .star-btn.active { color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.5); transform: scale(1.1); }
+.file-upload { border: 1px dashed rgba(255,255,255,0.2); border-radius: 12px; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,0.02); }
+.file-upload:hover { border-color: #fff; background: rgba(255,255,255,0.05); }
+.file-upload p { color: var(--muted); font-size: 0.85rem; margin-top: 0.5rem; font-weight: 500; }
+#imgPreview { width: 100%; max-height: 200px; object-fit: cover; margin-top: 1rem; border-radius: 8px; display: none; }
+.form-error { color: var(--neon-pink); font-size: 0.85rem; margin-top: 0.5rem; display: none; font-weight: 500; }
+.form-success { color: #3ecf8e; font-size: 0.85rem; margin-top: 1rem; display: none; font-weight: 500; }
+.submit-btn { width: 100%; background: #fff; color: #000; border: none; padding: 1rem; font-weight: 700; font-size: 1rem; border-radius: 12px; cursor: pointer; transition: all 0.3s; margin-top: 1rem; box-shadow: 0 4px 15px rgba(255,255,255,0.1); }
+.submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,255,255,0.2); }
+.submit-btn:disabled { opacity: 0.5; pointer-events: none; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--surface); border: 1px solid var(--border); padding: 1rem 1.5rem; border-radius: 12px; z-index: 9000; font-size: 0.9rem; font-weight: 500; transform: translateY(100px); opacity: 0; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-width: 320px; backdrop-filter: var(--glass-blur); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-left: 4px solid #3ecf8e; }
+.toast.error { border-left: 4px solid var(--neon-pink); }
+
+footer { padding: 2rem 1.5rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 1rem; text-align: center; background: rgba(0,0,0,0.2); }
+.footer-logo { font-size: 1.25rem; font-weight: 800; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.02em; }
+.footer-copy { font-size: 0.8rem; color: var(--muted); font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 300; }
+
+/* MAPS BUTTON ON CARDS */
+.maps-btn { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--surface); border: 1px solid var(--border); color: #fff; font-size: 0.8rem; font-weight: 500; padding: 0.5rem 1rem; border-radius: 100px; cursor: pointer; transition: all 0.2s; margin-top: 0.75rem; text-decoration: none; }
+.maps-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); transform: translateY(-1px); }
+.maps-btn svg { width: 14px; height: 14px; fill: currentColor; }
+
+/* MAPS PICKER MODAL */
+.maps-modal { background: rgba(15,15,20,0.95); border: 1px solid var(--border); border-radius: 24px 24px 0 0; border-bottom: none; padding: 2rem 1.5rem 3rem; width: 100%; max-width: 100%; position: relative; animation: slideUp 0.35s cubic-bezier(0.16,1,0.3,1); backdrop-filter: var(--glass-blur); }
 .maps-modal h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; }
 .maps-modal p { font-size: 0.9rem; color: var(--muted); margin-bottom: 2rem; font-weight: 300; }
 .maps-options { display: flex; flex-direction: column; gap: 1rem; }
@@ -486,7 +675,7 @@ footer { padding: 2rem 1.5rem; border-top: 1px solid var(--border); display: fle
 .detail-text { font-size: 1.05rem; color: var(--text); line-height: 1.8; margin-bottom: 2rem; font-weight: 300; }
 .detail-loc { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding: 1.25rem; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 1.5rem; }
 .detail-loc-text { font-size: 0.9rem; color: #fff; flex: 1; font-weight: 500; }
-.detail-loc-text::before { content: '📍 '; }
+.detail-loc-text::before { content: 'ðŸ“ '; }
 .detail-maps-btns { display: flex; gap: 0.75rem; flex-direction: column; width: 100%; }
 .detail-map-btn { display: flex; justify-content: center; align-items: center; gap: 0.5rem; background: var(--surface); border: 1px solid var(--border); color: #fff; font-size: 0.85rem; font-weight: 600; padding: 0.8rem 1.25rem; border-radius: 100px; cursor: pointer; transition: all 0.2s; text-decoration: none; width: 100%; }
 .detail-map-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); transform: translateY(-1px); }
@@ -505,7 +694,7 @@ footer { padding: 2rem 1.5rem; border-top: 1px solid var(--border); display: fle
 
 @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ── MOBILE ─────────────────────────────────────────────────── */
+/* â”€â”€ MOBILE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 
 
@@ -537,14 +726,14 @@ footer { padding: 2rem 1.5rem; border-top: 1px solid var(--border); display: fle
 .card-stack { cursor: pointer; }
 .card-stack .review-card { transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
 
-/* ── DESKTOP (Mobile First) ─────────────────────────────────── */
+/* â”€â”€ DESKTOP (Mobile First) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @media(min-width: 769px) {
   nav { padding: 1.25rem 4rem; }
 
   .hamburger { display: none; }
   .nav-links { display: flex; position: static; background: none; flex-direction: row; padding: 0; border: none; align-items: center; }
   .nav-right { flex-direction: row; width: auto; margin-top: 0; padding-top: 0; border-top: none; }
-  .fab { display: none; }
+  .fab { display: none !important; }
   
   .hero { grid-template-columns: 1.1fr 0.9fr; min-height: 85vh; padding: 0 4rem; }
   .hero-right { display: flex; transform: none; margin-top: 0; padding-bottom: 0; padding-left: 0; padding-right: 0; }
@@ -554,42 +743,6 @@ footer { padding: 2rem 1.5rem; border-top: 1px solid var(--border); display: fle
   .review-card:nth-child(2) { top: 60px; left: -20px; z-index: 2; opacity: 0.8; animation: float2 7s ease-in-out infinite; transform: scale(0.95); }
   .review-card:nth-child(3) { top: 120px; left: 30px; z-index: 1; opacity: 0.6; animation: float3 8s ease-in-out infinite; transform: scale(0.9); }
   .review-card:nth-child(4) { top: 180px; left: -10px; z-index: 0; opacity: 0.4; animation: float4 9s ease-in-out infinite; transform: scale(0.85); }
-  .review-card:nth-child(5) { top: 240px; left: 15px; z-index: -1; opacity: 0.2; animation: float5 10s ease-in-out infinite; transform: scale(0.8); }
-  .hero-left { padding-right: 2rem; padding-top: 0; padding-bottom: 0; padding-left: 0; }
-  h1 { font-size: clamp(3rem, 5vw, 5rem); }
-  .hero-desc { font-size: 1.1rem; }
-  .hero-actions { gap: 1.25rem; }
-  .btn-pri, .btn-ghost-hero { width: auto; text-align: center; }
-  .hero-stats { gap: 3rem; margin-top: 4rem; flex-wrap: nowrap; }
-  
-  .feed-section { padding: 6rem 4rem; }
-  .section-title { font-size: clamp(2rem, 3.5vw, 3rem); }
-  .cat-filter { gap: 0.75rem; }
-  .cat-btn { padding: 0.6rem 1.25rem; font-size: 0.85rem; }
-  .reviews-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; }
-  
-  .charts-section { padding: 6rem 4rem; }
-  .charts-header { flex-direction: row; align-items: flex-end; gap: 1.5rem; }
-  .charts-countdown { text-align: right; }
-  .charts-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; }
-  
-  .sql-panel { margin: 0 4rem 3rem; padding: 2rem; }
-  footer { flex-direction: row; gap: 0; text-align: left; padding: 3rem 4rem; justify-content: space-between; align-items: center; }
-  
-  .overlay { padding: 1rem; align-items: center; }
-  .modal { padding: 2.5rem; max-height: 90vh; border-radius: 24px; max-width: 500px; border-bottom: 1px solid var(--border); }
-  .detail-modal { max-height: 92vh; border-radius: 24px; max-width: 650px; }
-  .detail-body { padding: 1.5rem; }
-  .detail-img { border-radius: 24px 24px 0 0; }
-  .detail-title { font-size: 1.75rem; }
-  .detail-maps-btns { flex-direction: row; width: auto; }
-  .detail-map-btn { width: auto; justify-content: flex-start; }
-  
-  .maps-modal { padding: 2.5rem; max-width: 400px; border-radius: 24px; border-bottom: 1px solid var(--border); }
-  .loc-attach { flex-direction: row; }
-  .loc-detect-btn { width: auto; }
-  .loc-tabs { width: auto; display: flex; }
-  .loc-tab { text-align: left; padding: 0.6rem 1.25rem; }
 }
 
 
@@ -603,6 +756,44 @@ footer { padding: 2rem 1.5rem; border-top: 1px solid var(--border); display: fle
   animation: slideBounceIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
 
+
+/* â”€â”€ DESKTOP COMPLETE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+@media(min-width: 769px) {
+  .review-card:nth-child(5) { top: 240px; left: 15px; z-index: -1; opacity: 0.2; animation: float5 10s ease-in-out infinite; transform: scale(0.8); }
+  .hero-left { padding-right: 2rem; padding-top: 0; padding-bottom: 0; padding-left: 0; }
+  h1 { font-size: clamp(3rem, 5vw, 5rem); }
+  .hero-desc { font-size: 1.1rem; }
+  .hero-actions { gap: 1.25rem; }
+  .btn-pri, .btn-ghost-hero { width: auto; text-align: center; }
+  .hero-stats { gap: 3rem; margin-top: 4rem; flex-wrap: nowrap; }
+  .feed-section { padding: 6rem 4rem; }
+  .section-title { font-size: clamp(2rem, 3.5vw, 3rem); }
+  .cat-filter { gap: 0.75rem; }
+  .cat-btn { padding: 0.6rem 1.25rem; font-size: 0.85rem; }
+  .reviews-grid { gap: 2rem; }
+  .reviews-grid .r-card { min-width: 350px; }
+  .charts-section { padding: 6rem 4rem; }
+  .charts-header { flex-direction: row; align-items: flex-end; gap: 1.5rem; }
+  .charts-countdown { text-align: right; }
+  .charts-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; }
+  .sql-panel { margin: 0 4rem 3rem; padding: 2rem; }
+  footer { flex-direction: row; gap: 0; text-align: left; padding: 3rem 4rem; justify-content: space-between; align-items: center; }
+  /* Desktop: center modals */
+  .overlay { padding: 1rem; align-items: center; }
+  .modal { padding: 2.5rem; max-height: 90vh; border-radius: 24px; max-width: 520px; border-bottom: 1px solid var(--border); animation: fadeScale 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+  .detail-modal { max-height: 92vh; border-radius: 24px; max-width: 650px; }
+  .detail-body { padding: 2rem; }
+  .detail-img { border-radius: 24px 24px 0 0; }
+  .detail-title { font-size: 1.75rem; }
+  .detail-maps-btns { flex-direction: row; width: auto; }
+  .detail-map-btn { width: auto; justify-content: flex-start; }
+  .maps-modal { padding: 2.5rem; max-width: 420px; border-radius: 24px; border-bottom: 1px solid var(--border); border: 1px solid var(--border); animation: fadeScale 0.3s cubic-bezier(0.16,1,0.3,1); }
+  .loc-attach { flex-direction: row; }
+  .loc-detect-btn { width: auto; }
+  .loc-tabs { width: auto; display: flex; }
+  .loc-tab { text-align: left; padding: 0.6rem 1.25rem; }
+}
+
 </style>
 
 </head>
@@ -612,14 +803,14 @@ footer { padding: 2rem 1.5rem; border-top: 1px solid var(--border); display: fle
 <!-- NAV -->
 <nav>
   <div class="logo">Random<span>Reviews</span></div>
-  <button class="hamburger" onclick="toggleMenu(this)">☰</button>
+  <button class="hamburger" onclick="toggleMenu(this)">â˜°</button>
   <ul class="nav-links">
     <li><a href="#" class="active" onclick="filterCat('all',this); document.getElementById('feedSection').scrollIntoView({behavior:'smooth'}); return false">All</a></li>
     <li><a href="#" onclick="filterCat('food',this); document.getElementById('feedSection').scrollIntoView({behavior:'smooth'}); return false">Food</a></li>
     <li><a href="#" onclick="filterCat('spot',this); document.getElementById('feedSection').scrollIntoView({behavior:'smooth'}); return false">Spots</a></li>
     <li><a href="#" onclick="filterCat('flat',this); document.getElementById('feedSection').scrollIntoView({behavior:'smooth'}); return false">Flats</a></li>
     <li><a href="#" onclick="filterCat('travel',this); document.getElementById('feedSection').scrollIntoView({behavior:'smooth'}); return false">Travel</a></li>
-    <li><a href="#" onclick="document.getElementById('chartsSection').scrollIntoView({behavior:'smooth'}); return false">🏆 Charts</a></li>
+    <li><a href="#" onclick="document.getElementById('chartsSection').scrollIntoView({behavior:'smooth'}); return false">ðŸ† Charts</a></li>
   <li class="nav-right">
     <button class="nav-btn ghost" id="userInfo" style="display:none" onclick="openProfile()">Profile</button>
     <button class="nav-btn ghost" id="loginBtn" onclick="openAuth()">Login</button>
@@ -634,40 +825,40 @@ footer { padding: 2rem 1.5rem; border-top: 1px solid var(--border); display: fle
 <section class="hero">
   
   <div class="hero-left">
-    <div class="badge">SRM Students Only 🔥</div>
+    <div class="badge">SRM Students Only ðŸ”¥</div>
     <h1>No BS.<br><span class="l2">Real Reviews.</span><br><span class="l3">By SRMites.</span></h1>
-    <p class="hero-desc">everything your senior wouldn't tell you, something better</p>
+    <p class="hero-desc">The real talk your seniors always meant to share</p>
     
     <div class="hero-actions">
-      <button class="btn-pri" onclick="document.getElementById('feedSection').scrollIntoView({behavior:'smooth'})">Start Exploring →</button>
+      <button class="btn-pri" onclick="document.getElementById('feedSection').scrollIntoView({behavior:'smooth'})">Start Exploring â†’</button>
       <button class="btn-ghost-hero" onclick="openAuthOrReview()">Drop a Review</button>
     </div>
     <div class="hero-stats">
-      <div><div class="stat-num" id="totalCount">—</div><div class="stat-label">Reviews</div></div>
+      <div><div class="stat-num" id="totalCount">â€”</div><div class="stat-label">Reviews</div></div>
       <div><div class="stat-num">4</div><div class="stat-label">Categories</div></div>
-      <div><div class="stat-num" id="userCount">—</div><div class="stat-label">SRMites</div></div>
+      <div><div class="stat-num" id="userCount">â€”</div><div class="stat-label">SRMites</div></div>
     </div>
   </div>
   <div class="hero-right">
     <div class="card-stack">
       <div class="review-card">
-        <div class="card-img-ph">🍛</div>
+        <div class="card-img-ph">ðŸ›</div>
         <div class="card-tag tag-food">Food</div>
         <div class="card-title">Saravana Bhavan Near Gate 3</div>
-        <div class="card-body">Bro the sambar rice at ₹45 hits different at 11pm. Always consistent, never disappoints.</div>
-        <div class="card-footer"><span class="stars">★★★★★</span><span class="card-author">@karthik_22cs</span></div>
+        <div class="card-body">Bro the sambar rice at â‚¹45 hits different at 11pm. Always consistent, never disappoints.</div>
+        <div class="card-footer"><span class="stars">â˜…â˜…â˜…â˜…â˜…</span><span class="card-author">@karthik_22cs</span></div>
       </div>
       <div class="review-card">
         <div class="card-tag tag-spot">Hidden Spot</div>
         <div class="card-title">Terrace Behind C Block</div>
         <div class="card-body">Best cram spot or just vibe zone. Zero crowd after 8pm. Bring a jacket tho.</div>
-        <div class="card-footer"><span class="stars">★★★★☆</span><span class="card-author">@priya_mech21</span></div>
+        <div class="card-footer"><span class="stars">â˜…â˜…â˜…â˜…â˜†</span><span class="card-author">@priya_mech21</span></div>
       </div>
       <div class="review-card">
         <div class="card-tag tag-flat">Flat / PG</div>
         <div class="card-title">Sai Residency, Potheri</div>
-        <div class="card-body">AC room, ₹7500/mo. Owner is chill, no curfew, WiFi is actually fast.</div>
-        <div class="card-footer"><span class="stars">★★★★☆</span><span class="card-author">@aditya_ece23</span></div>
+        <div class="card-body">AC room, â‚¹7500/mo. Owner is chill, no curfew, WiFi is actually fast.</div>
+        <div class="card-footer"><span class="stars">â˜…â˜…â˜…â˜…â˜†</span><span class="card-author">@aditya_ece23</span></div>
       </div>
     </div>
   </div>
@@ -683,7 +874,7 @@ footer { padding: 2rem 1.5rem; border-top: 1px solid var(--border); display: fle
 
 <!-- SQL SETUP HELPER -->
 <div class="sql-panel" id="sqlHelper" style="display:none">
-  <h3>⚠️ One-time DB setup needed — go to Supabase → SQL Editor → paste and run this:</h3>
+  <h3>âš ï¸ One-time DB setup needed â€” go to Supabase â†’ SQL Editor â†’ paste and run this:</h3>
   <pre>create table if not exists reviews (
   id uuid default gen_random_uuid() primary key,
   created_at timestamp with time zone default now(),
@@ -767,7 +958,7 @@ create policy "Enforce image limits" on storage.objects for insert to authentica
   <div class="section-label">Browse reviews</div>
   <h2 class="section-title">What's everyone saying?</h2>
   <div class="cat-filter">
-    <button class="cat-btn active" data-cat="all" onclick="filterCat('all',this)">🔥 All</button>
+    <button class="cat-btn active" data-cat="all" onclick="filterCat('all',this)">ðŸ”¥ All</button>
     <button class="cat-btn" data-cat="food" onclick="filterCat('food',this)"> Food</button>
     <button class="cat-btn" data-cat="spot" onclick="filterCat('spot',this)"> Spots</button>
     <button class="cat-btn" data-cat="flat" onclick="filterCat('flat',this)"> Flats</button>
@@ -789,7 +980,7 @@ create policy "Enforce image limits" on storage.objects for insert to authentica
   <div class="charts-header">
     <div class="charts-title-block">
       <div class="section-label">Every Sunday 5 PM</div>
-      <h2 class="section-title">Weekly Top Charts 🏆</h2>
+      <h2 class="section-title">Weekly Top Charts ðŸ†</h2>
     </div>
     <div class="charts-countdown">
       Next drop in<br>
@@ -807,7 +998,7 @@ create policy "Enforce image limits" on storage.objects for insert to authentica
   <div class="charts-header">
     <div class="charts-title-block">
       <div class="section-label">Top Reviewers</div>
-      <h2 class="section-title">Hall of Fame 👑</h2>
+      <h2 class="section-title">Hall of Fame ðŸ‘‘</h2>
     </div>
   </div>
   <div class="charts-grid" id="leaderboardGrid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
@@ -817,14 +1008,14 @@ create policy "Enforce image limits" on storage.objects for insert to authentica
 
 <footer>
   <div class="footer-logo">RandomReviews</div>
-  <div class="footer-copy">// built for SRMites, by SRMites · 2025</div>
+  <div class="footer-copy">// built for SRMites, by SRMites Â· 2025</div>
 </footer>
 
 <!-- AUTH MODAL -->
 <div class="overlay" id="authModal">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('authModal')">✕</button>
-    <h2 id="authModalTitle">Welcome Back 👋</h2>
+    <button class="modal-close" onclick="closeModal('authModal')">âœ•</button>
+    <h2 id="authModalTitle">Welcome Back ðŸ‘‹</h2>
     <p class="modal-sub" id="authModalDesc">Sign in to drop reviews and help your batch.</p>
 
     <div class="modal-tabs">
@@ -833,19 +1024,19 @@ create policy "Enforce image limits" on storage.objects for insert to authentica
     </div>
     <!-- LOGIN -->
     <div class="tab-panel active" id="loginPanel">
-      <div class="fg"><label>Email</label><input type="email" id="loginEmail" placeholder="you@srmist.edu.in"></div>
-      <div class="fg"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
+      <div class="fg"><label>Email</label><input type="email" id="loginEmail" placeholder="you@srmist.edu.in" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="fg"><label>Password</label><input type="password" id="loginPassword" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <div class="form-error" id="loginError"></div>
-      <button class="submit-btn" id="loginBtn2" onclick="doLogin()">Login →</button>
+      <button class="submit-btn" id="loginBtn2" onclick="doLogin()">Login â†’</button>
     </div>
     <!-- SIGNUP -->
     <div class="tab-panel" id="signupPanel">
-      <div class="fg"><label>SRM Email</label><input type="email" id="signupEmail" placeholder="ra1234@srmist.edu.in"></div>
-      <div class="fg"><label>Password (min 8 chars)</label><input type="password" id="signupPassword" placeholder="••••••••"></div>
-      <div class="fg"><label>Display Name / Username</label><input type="text" id="signupUsername" placeholder="karthik_22cs"></div>
+      <div class="fg"><label>SRM Email</label><input type="email" id="signupEmail" placeholder="ra1234@srmist.edu.in" onkeydown="if(event.key==='Enter')doSignup()"></div>
+      <div class="fg"><label>Password (min 8 chars)</label><input type="password" id="signupPassword" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" onkeydown="if(event.key==='Enter')doSignup()"></div>
+      <div class="fg"><label>Display Name / Username</label><input type="text" id="signupUsername" placeholder="karthik_22cs" onkeydown="if(event.key==='Enter')doSignup()"></div>
       <div class="form-error" id="signupError"></div>
-      <div class="form-success" id="signupSuccess">✅ Check your email to confirm, then log in!</div>
-      <button class="submit-btn" id="signupBtn2" onclick="doSignup()">Create Account →</button>
+      <div class="form-success" id="signupSuccess">âœ… Check your email to confirm, then log in!</div>
+      <button class="submit-btn" id="signupBtn2" onclick="doSignup()">Create Account â†’</button>
     </div>
   </div>
 </div>
@@ -853,8 +1044,8 @@ create policy "Enforce image limits" on storage.objects for insert to authentica
 <!-- REVIEW MODAL -->
 <div class="overlay" id="reviewModal">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('reviewModal')">✕</button>
-    <h2>Drop a Review 🔥</h2>
+    <button class="modal-close" onclick="closeModal('reviewModal')">âœ•</button>
+    <h2>Drop a Review ðŸ”¥</h2>
     <p class="modal-sub">Be real. Other SRMites are counting on you.</p>
     <div class="fg">
       <label>Category</label>
@@ -869,8 +1060,8 @@ create policy "Enforce image limits" on storage.objects for insert to authentica
     <div class="fg">
       <label>Location (optional)</label>
       <div class="loc-tabs">
-        <button class="loc-tab active" id="locTabSearch" onclick="switchLocTab('search')">🔍 Search</button>
-        <button class="loc-tab" id="locTabDetect" onclick="switchLocTab('detect')">📍 Use My Location</button>
+        <button class="loc-tab active" id="locTabSearch" onclick="switchLocTab('search')">ðŸ” Search</button>
+        <button class="loc-tab" id="locTabDetect" onclick="switchLocTab('detect')">ðŸ“ Use My Location</button>
       </div>
       <div id="locSearchPane">
         <input type="text" id="rLocation" placeholder="Search a place, e.g. Potheri Bus Stand" oninput="searchLocation(this.value)">
@@ -879,43 +1070,43 @@ create policy "Enforce image limits" on storage.objects for insert to authentica
       <div id="locDetectPane" style="display:none">
         <div style="display:flex;gap:.5rem">
           <input type="text" id="rLocationGps" placeholder="GPS coordinates will appear here" readonly>
-          <button class="loc-detect-btn" onclick="detectLocation()">📍 Detect</button>
+          <button class="loc-detect-btn" onclick="detectLocation()">ðŸ“ Detect</button>
         </div>
       </div>
       <div class="loc-coords" id="locCoords"></div>
       <div id="gpsWarning" style="display:none; color:var(--neon-orange); font-size:0.7rem; margin-top:0.4rem;">
-        ⚠️ Sharing exact GPS on a flat/PG review may reveal where you live — consider using the Search tab with just the area name instead.
+        âš ï¸ Sharing exact GPS on a flat/PG review may reveal where you live â€” consider using the Search tab with just the area name instead.
       </div>
     </div>
     <div class="fg"><label>Your Review</label><textarea id="rBody" placeholder="Be honest. What did you actually think? Is it worth it?"></textarea></div>
     <div class="fg">
       <label>Rating</label>
       <div class="star-rating">
-        <button class="star-btn" onclick="setRating(1)">★</button>
-        <button class="star-btn" onclick="setRating(2)">★</button>
-        <button class="star-btn" onclick="setRating(3)">★</button>
-        <button class="star-btn" onclick="setRating(4)">★</button>
-        <button class="star-btn" onclick="setRating(5)">★</button>
+        <button class="star-btn" onclick="setRating(1)">â˜…</button>
+        <button class="star-btn" onclick="setRating(2)">â˜…</button>
+        <button class="star-btn" onclick="setRating(3)">â˜…</button>
+        <button class="star-btn" onclick="setRating(4)">â˜…</button>
+        <button class="star-btn" onclick="setRating(5)">â˜…</button>
       </div>
     </div>
     <div class="fg">
       <label>Photo (optional)</label>
       <div class="file-upload" onclick="document.getElementById('photoInput').click()">
-        <p>📷 Click to upload a photo</p>
-        <p>JPG, PNG — max 5MB</p>
+        <p>ðŸ“· Click to upload a photo</p>
+        <p>JPG, PNG â€” max 5MB</p>
         <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="previewImg(this)">
         <img id="imgPreview" alt="preview">
       </div>
     </div>
     <div class="form-error" id="reviewError"></div>
-    <button class="submit-btn" id="submitBtn" onclick="submitReview()">Post Review →</button>
+    <button class="submit-btn" id="submitBtn" onclick="submitReview()">Post Review â†’</button>
   </div>
 </div>
 
 <!-- REVIEW DETAIL MODAL -->
 <div class="overlay" id="detailModal">
   <div class="detail-modal">
-    <button class="modal-close" onclick="closeModal('detailModal')" style="position:absolute;top:1rem;right:1rem;z-index:10;background:rgba(10,10,15,.8);border:1px solid var(--border);color:var(--text);font-size:1.1rem;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer">✕</button>
+    <button class="modal-close" onclick="closeModal('detailModal')" style="position:absolute;top:1rem;right:1rem;z-index:10;background:rgba(10,10,15,.8);border:1px solid var(--border);color:var(--text);font-size:1.1rem;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer">âœ•</button>
     <div id="detailContent"></div>
   </div>
 </div>
@@ -923,31 +1114,34 @@ create policy "Enforce image limits" on storage.objects for insert to authentica
 <!-- MAPS MODAL -->
 <div class="overlay" id="mapsModal">
   <div class="maps-modal">
-    <button class="modal-close" onclick="closeModal('mapsModal')">✕</button>
-    <h3>📍 Open in Maps</h3>
-    <p id="mapsModalDesc">Choose your maps app</p>
+    <button class="modal-close" onclick="closeModal('mapsModal')">âœ•</button>
+    <h3 style="display:flex;align-items:center;gap:.6rem;font-size:1.3rem;font-weight:800;margin-bottom:.4rem">ðŸ“ Open in Maps</h3>
+    <p id="mapsModalDesc" style="font-size:.85rem;color:var(--muted);margin-bottom:1.75rem;font-weight:300">Open in your preferred maps app</p>
     <div class="maps-options">
       <a class="map-option" id="gmapsLink" href="#" target="_blank" rel="noopener" onclick="closeModal('mapsModal')">
-        
+        <span class="map-option-icon" style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;flex-shrink:0">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThWo3UwQ9eEl87JDDkU7ICxJqFhq5gOeFPk4ukR97kmw&s=10" alt="Google Maps" style="width:44px;height:44px;object-fit:contain;border-radius:12px;display:block">
+        </span>
         <div><div class="map-option-label">Google Maps</div><div class="map-option-sub">Works on all devices</div></div>
       </a>
       <a class="map-option" id="applemapsLink" href="#" target="_blank" rel="noopener" onclick="closeModal('mapsModal')">
-        
+        <span class="map-option-icon" style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;flex-shrink:0">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEPEhZCOFvIPe17NkIBREi0sH0ZxXKlvsmhpDXN_AN6w&s=10" alt="Apple Maps" style="width:44px;height:44px;object-fit:contain;border-radius:12px;display:block">
+        </span>
         <div><div class="map-option-label">Apple Maps</div><div class="map-option-sub">iPhone / Mac recommended</div></div>
       </a>
       <a class="map-option" id="wazeLink" href="#" target="_blank" rel="noopener" onclick="closeModal('mapsModal')">
-        
+        <span class="map-option-icon" style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;flex-shrink:0;font-size:2rem">ðŸš—</span>
         <div><div class="map-option-label">Waze</div><div class="map-option-sub">Best for driving / autos</div></div>
       </a>
     </div>
   </div>
 </div>
 
-
 <!-- PROFILE MODAL -->
 <div class="overlay" id="profileModal">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('profileModal')">✕</button>
+    <button class="modal-close" onclick="closeModal('profileModal')">âœ•</button>
     <h2>Your Profile</h2>
     <p class="modal-sub" id="profileEmail">you@srmist.edu.in</p>
     
@@ -971,14 +1165,14 @@ create policy "Enforce image limits" on storage.objects for insert to authentica
 
 
 <script>
-// ── SUPABASE ──────────────────────────────────────────────────
+// â”€â”€ SUPABASE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const { createClient } = supabase
 const db = createClient(
   'https://crczujkkyaxgxcdlgqxh.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyY3p1amtreWF4Z3hjZGxncXhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1ODIzNDcsImV4cCI6MjA4NzE1ODM0N30.ytuBOH34PUvkT2XXD_Ky4TTuQZIIibNVyVInUvFTO4Y'
 )
 
-// ── STATE ─────────────────────────────────────────────────────
+// â”€â”€ STATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let currentUser = null
 let currentRating = 0
 let currentFilter = 'all';
@@ -987,7 +1181,7 @@ let allReviews = []
 let currentLat = null
 let currentLng = null
 
-// ── AUTH ──────────────────────────────────────────────────────
+// â”€â”€ AUTH â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function initAuth(){
   const {data:{session}} = await db.auth.getSession()
   if(session?.user) setUser(session.user)
@@ -1026,7 +1220,7 @@ async function doLogin(){
   if(!email||!pass){showErr(errEl,'Fill in all fields');return}
   btn.disabled=true;btn.textContent='Logging in...'
   const {error}=await db.auth.signInWithPassword({email,password:pass})
-  btn.disabled=false;btn.textContent='Login →'
+  btn.disabled=false;btn.textContent='Login â†’'
   if(error){
     if(error.message.includes('Invalid login credentials') || error.message.includes('Email not confirmed')) {
       showErr(errEl, error.message);
@@ -1036,7 +1230,7 @@ async function doLogin(){
     }
   }
   else {
-    showToast('Logged in! 👋', 'success');
+    showToast('Logged in! ðŸ‘‹', 'success');
   }
 }
 
@@ -1056,10 +1250,10 @@ async function doSignup(){
   const {data,error}=await db.auth.signUp({
     email, password:pass, options:{data:{username}}
   })
-  btn.disabled=false;btn.textContent='Create Account →'
+  btn.disabled=false;btn.textContent='Create Account â†’'
   if(error){
     if(error.message.includes('unique constraint') || error.message.includes('duplicate key value')) {
-      showErr(errEl, 'Username @' + username + ' is already taken — pick another one');
+      showErr(errEl, 'Username @' + username + ' is already taken â€” pick another one');
     } else if(error.message.includes('weak_password') || error.message.includes('Password')) {
       showErr(errEl, error.message);
     } else {
@@ -1071,7 +1265,7 @@ async function doSignup(){
       await db.from('profiles').upsert({ id: data.user.id, username });
     }
     sucEl.style.display='block'; 
-    showToast('Account created! Check your email. 📬', 'success');
+    showToast('Account created! Check your email. ðŸ“¬', 'success');
     setTimeout(() => {
       switchTab('login');
       document.getElementById('loginEmail').value = email;
@@ -1081,7 +1275,7 @@ async function doSignup(){
 
 async function doLogout(){
   await db.auth.signOut()
-  showToast('Logged out. See you! 👋','success')
+  showToast('Logged out. See you! ðŸ‘‹','success')
 }
 
 
@@ -1102,7 +1296,7 @@ async function loadReviews(){
     document.getElementById('userCount').textContent=Math.max(1,Math.floor(allReviews.length*1.4))+'+'
   }catch(e){
     console.error(e)
-    document.getElementById('reviewsGrid').innerHTML='<div class="state-box">⚠️ Could not load reviews. See setup instructions above.</div>'
+    document.getElementById('reviewsGrid').innerHTML='<div class="state-box">âš ï¸ Could not load reviews. See setup instructions above.</div>'
     document.getElementById('sqlHelper').style.display='block'
     document.getElementById('totalCount').textContent='0'
     document.getElementById('userCount').textContent='0'
@@ -1123,7 +1317,7 @@ function renderReviews(){
 
   if(!list.length){
 
-    grid.innerHTML=`<div class="empty-state"><div class="icon">🫥</div><p>No reviews here yet.<br>Be the first to drop one!</p></div>`
+    grid.innerHTML=`<div class="empty-state"><div class="icon">ðŸ«¥</div><p>No reviews here yet.<br>Be the first to drop one!</p></div>`
     return
   }
   const tagMap={food:'tag-food',spot:'tag-spot',flat:'tag-flat',travel:'tag-travel'}
@@ -1144,17 +1338,17 @@ function renderReviews(){
     const isSample = sampleTitles.includes(r.title);
     const sampleBadge = isSample ? '<div style="position:absolute; top:1rem; right:1rem; background:rgba(0,0,0,0.5); color:var(--muted); font-size:0.6rem; font-weight:700; padding:0.25rem 0.5rem; border-radius:100px; border:1px solid var(--border); letter-spacing:0.05em; z-index:10; pointer-events:none; backdrop-filter:blur(4px);">SAMPLE</div>' : '';
     const delay = (idx * 0.05).toFixed(2);
-    const stars='★'.repeat(r.rating)+'☆'.repeat(5-r.rating)
+    const stars='â˜…'.repeat(r.rating)+'â˜†'.repeat(5-r.rating)
     const img=r.image_url?`<img src="${esc(r.image_url)}" alt="photo" loading="lazy">`:'';
     const date=new Date(r.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short'})
     const uname=r.profiles?.username||r.username||'anon'
 
-    // Aggregate block — only show if 2+ reviews for this place
+    // Aggregate block â€” only show if 2+ reviews for this place
     const agg=aggMap[r.title.trim().toLowerCase()]
     let aggHtml=''
     if(agg&&agg.count>=2){
       const avg=(agg.total/agg.count).toFixed(1)
-      const avgStars='★'.repeat(Math.round(agg.total/agg.count))+'☆'.repeat(5-Math.round(agg.total/agg.count))
+      const avgStars='â˜…'.repeat(Math.round(agg.total/agg.count))+'â˜†'.repeat(5-Math.round(agg.total/agg.count))
       const bars=[5,4,3,2,1].map(n=>{
         const pct=agg.count>0?Math.round((agg.dist[n]||0)/agg.count*100):0
         return `<div class="bar-row"><span class="bar-label">${n}</span><div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div><span class="bar-num">${agg.dist[n]||0}</span></div>`
@@ -1184,21 +1378,21 @@ function renderReviews(){
       </div>`
     }
 
-    return `<div class="r-card ${r.category} animate-in" onclick="openDetail('${r.id}')" style="cursor:pointer; animation-delay: ${delay}s;">${sampleBadge}${img}<div class="card-tag ${tagMap[r.category]}">${catLabel[r.category]}</div><div class="r-card-title">${esc(r.title)}</div><div class="r-card-body">${esc(r.body)}</div>${locHtml}${aggHtml}<div class="r-card-meta" style="margin-top:.75rem"><span class="stars">${stars}</span><span class="r-card-author">@${esc(uname)} · ${date}</span></div></div>`
+    return `<div class="r-card ${r.category} animate-in" onclick="openDetail('${r.id}')" style="cursor:pointer; animation-delay: ${delay}s;">${sampleBadge}${img}<div class="card-tag ${tagMap[r.category]}">${catLabel[r.category]}</div><div class="r-card-title">${esc(r.title)}</div><div class="r-card-body">${esc(r.body)}</div>${locHtml}${aggHtml}<div class="r-card-meta" style="margin-top:.75rem"><span class="stars">${stars}</span><span class="r-card-author">@${esc(uname)} Â· ${date}</span></div></div>`
   }).join('')
 }
 
-// ── TICKER ────────────────────────────────────────────────────
+// â”€â”€ TICKER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function buildTicker(){
   const track = document.getElementById('tickerTrack')
   if(!allReviews.length){
-    track.innerHTML='<div class="ti" style="color:var(--muted);font-family:\'Space Mono\',monospace;font-size:.75rem">No reviews yet — be the first! 👀</div>'
+    track.innerHTML='<div class="ti" style="color:var(--muted);font-family:\'Space Mono\',monospace;font-size:.75rem">No reviews yet â€” be the first! ðŸ‘€</div>'
     return
   }
   // Take up to 10 most recent, then duplicate for seamless loop
   const recent = allReviews.slice(0, 10)
   const makeItem = r => {
-    const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating)
+    const stars = 'â˜…'.repeat(r.rating) + 'â˜†'.repeat(5 - r.rating)
     const uname = r.username || 'anon'
     return `<div class="ti"><span class="ti-star">${stars}</span> ${esc(r.title)} <span class="ti-name">@${esc(uname)}</span></div>`
   }
@@ -1225,18 +1419,23 @@ async function submitReview(){
   if(!currentRating){showErr(errEl,'Pick a star rating');return}
   btn.disabled=true;btn.textContent='Posting...'
 
-  // Upload photo if present
+  // Upload photo if present (with compression for speed)
   let imageUrl=null
   const file=document.getElementById('photoInput').files[0]
   if(file){
-    if(!['image/jpeg','image/png','image/webp'].includes(file.type)){showErr(errEl,'Only JPG, PNG, and WEBP allowed');btn.disabled=false;btn.textContent='Post Review →';return;}
-    if(file.size>5*1024*1024){showErr(errEl,'File too large (max 5MB)');btn.disabled=false;btn.textContent='Post Review →';return;}
-    const ext=file.name.split('.').pop()
-    const fname=`${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-    const {error:upErr}=await db.storage.from('review-images').upload(fname,file)
-    if(upErr){showErr(errEl,'Photo upload failed: '+upErr.message);btn.disabled=false;btn.textContent='Post Review →';return}
+    if(!['image/jpeg','image/png','image/webp'].includes(file.type)){showErr(errEl,'Only JPG, PNG, and WEBP allowed');btn.disabled=false;btn.textContent='Post Review â†’';return;}
+    if(file.size>5*1024*1024){showErr(errEl,'File too large (max 5MB)');btn.disabled=false;btn.textContent='Post Review â†’';return;}
+    btn.textContent='Uploading photo...'
+    let uploadFile = file
+    try {
+      uploadFile = await compressImage(file, 1200, 0.82)
+    } catch(e) { uploadFile = file }
+    const fname=`${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`
+    const {error:upErr}=await db.storage.from('review-images').upload(fname, uploadFile, {contentType:'image/jpeg'})
+    if(upErr){showErr(errEl,'Photo upload failed: '+upErr.message);btn.disabled=false;btn.textContent='Post Review â†’';return}
     const {data:{publicUrl}}=db.storage.from('review-images').getPublicUrl(fname)
     imageUrl=publicUrl
+    btn.textContent='Posting...'
   }
 
   const uname=currentUser.user_metadata?.username||currentUser.email.split('@')[0]
@@ -1247,16 +1446,16 @@ async function submitReview(){
     lat:currentLat||null, lng:currentLng||null
   }).select('*, profiles(username)');
 
-  btn.disabled=false;btn.textContent='Post Review →'
+  btn.disabled=false;btn.textContent='Post Review â†’'
   if(error){
     if(error.message.includes('policy')||error.message.includes('permission')){
-      showErr(errEl,'DB not set up yet — run the SQL setup from the panel above first.');
+      showErr(errEl,'DB not set up yet â€” run the SQL setup from the panel above first.');
     } else {
       console.error(error);
       showErr(errEl,'Something went wrong, try again');
     }
   } else {
-    showToast('Review posted! 🔥 Keeping it real.','success')
+    showToast('Review posted! ðŸ”¥ Keeping it real.','success')
     closeModal('reviewModal')
     resetForm()
     
@@ -1269,11 +1468,11 @@ async function submitReview(){
   }
 }
 
-// ── WEEKLY TOP CHARTS ─────────────────────────────────────────
+// â”€â”€ WEEKLY TOP CHARTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function buildCharts(){
   const grid=document.getElementById('chartsGrid')
   if(!allReviews.length){
-    grid.innerHTML='<div class="state-box">No reviews yet — charts will appear once people start reviewing!</div>'
+    grid.innerHTML='<div class="state-box">No reviews yet â€” charts will appear once people start reviewing!</div>'
     return
   }
 
@@ -1296,7 +1495,7 @@ function buildCharts(){
   const sourceReviews=weekReviews.length>=3?weekReviews:allReviews // fallback to all time if too few
 
   const weekLabel=weekReviews.length>=3
-    ?`${weekAgo.toLocaleDateString('en-IN',{day:'numeric',month:'short'})} – ${now.toLocaleDateString('en-IN',{day:'numeric',month:'short'})}`
+    ?`${weekAgo.toLocaleDateString('en-IN',{day:'numeric',month:'short'})} â€“ ${now.toLocaleDateString('en-IN',{day:'numeric',month:'short'})}`
     :'All time (not enough weekly data yet)'
   document.getElementById('weekRange').textContent=weekLabel
 
@@ -1323,19 +1522,19 @@ function buildCharts(){
       places[key].count++
     })
 
-    // Sort: weighted score = avg * log(count+1) — rewards consistency + volume
+    // Sort: weighted score = avg * log(count+1) â€” rewards consistency + volume
     const ranked=Object.values(places)
       .map(p=>({...p,avg:p.total/p.count,score:(p.total/p.count)*Math.log(p.count+1)}))
       .sort((a,b)=>b.score-a.score)
       .slice(0,5)
 
     const rankClass=['r1','r2','r3','rn','rn']
-    const rankLabel=['🥇','🥈','🥉','4','5']
+    const rankLabel=['ðŸ¥‡','ðŸ¥ˆ','ðŸ¥‰','4','5']
     const items=ranked.map((p,i)=>`
       <div class="chart-item">
         <span class="chart-rank ${rankClass[i]}">${rankLabel[i]}</span>
         <span class="chart-name" title="${esc(p.title)}">${esc(p.title)}</span>
-        <span class="chart-score">${p.avg.toFixed(1)}★</span>
+        <span class="chart-score">${p.avg.toFixed(1)}â˜…</span>
         <span class="chart-reviews">${p.count}x</span>
       </div>`).join('')
 
@@ -1349,7 +1548,7 @@ function buildCharts(){
 }
 
 
-// ── LEADERBOARD ───────────────────────────────────────────────
+// â”€â”€ LEADERBOARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function buildLeaderboard() {
   const lbGrid = document.getElementById('leaderboardGrid');
   if(!lbGrid) return;
@@ -1390,13 +1589,13 @@ function buildLeaderboard() {
   });
   
   const rankClass = ['r1','r2','r3'];
-  const rankLabel = ['🥇','🥈','🥉'];
+  const rankLabel = ['ðŸ¥‡','ðŸ¥ˆ','ðŸ¥‰'];
   
   const itemsHTML = sortedUsers.slice(0, 10).map((u, i) => `
     <div class="chart-item">
       <span class="chart-rank ${rankClass[i] || 'rn'}">${rankLabel[i] || (i+1)}</span>
       <span class="chart-name" title="@${esc(u.username)}">@${esc(u.username)}</span>
-      <span class="chart-score">${(u.totalRating / u.count).toFixed(1)}★ avg</span>
+      <span class="chart-score">${(u.totalRating / u.count).toFixed(1)}â˜… avg</span>
       <span class="chart-reviews">${u.count} reviews</span>
     </div>
   `).join('');
@@ -1408,7 +1607,7 @@ function buildLeaderboard() {
   `;
 }
 
-// ── COUNTDOWN to next Sunday 5pm IST ──────────────────────────
+// â”€â”€ COUNTDOWN to next Sunday 5pm IST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function updateCountdown(){
   const now=new Date()
   const istOffset=5.5*60*60*1000
@@ -1426,7 +1625,7 @@ function updateCountdown(){
   }
 
   const diff=nextSun.getTime()-nowIST.getTime()
-  if(diff<=0){document.getElementById('countdownVal').textContent='Charts updating now! 🔥';return}
+  if(diff<=0){document.getElementById('countdownVal').textContent='Charts updating now! ðŸ”¥';return}
 
   const d=Math.floor(diff/(1000*60*60*24))
   const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60))
@@ -1451,7 +1650,7 @@ function filterCat(cat,el){
   renderReviews()
 }
 
-// ── LOCATION DETECT ───────────────────────────────────────────
+// â”€â”€ LOCATION DETECT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function detectLocation(){
   const btn=document.querySelector('.loc-detect-btn')
   const coordsEl=document.getElementById('locCoords')
@@ -1462,17 +1661,17 @@ function detectLocation(){
     pos=>{
       currentLat=pos.coords.latitude
       currentLng=pos.coords.longitude
-      btn.textContent='✅ Got it!'
+      btn.textContent='âœ… Got it!'
       btn.disabled=false
       coordsEl.textContent=`${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`
       coordsEl.style.display='block'
       // Pre-fill location text if empty
       const locInput=document.getElementById('rLocation')
       if(!locInput.value) locInput.value='Location attached (GPS)'
-      showToast('Location detected! 📍','success')
+      showToast('Location detected! ðŸ“','success')
     },
     err=>{
-      btn.textContent='📍 Detect'
+      btn.textContent='ðŸ“ Detect'
       btn.disabled=false
       const msgs={1:'Location permission denied',2:'Position unavailable',3:'Request timed out'}
       showToast(msgs[err.code]||'Could not get location','error')
@@ -1481,7 +1680,7 @@ function detectLocation(){
   )
 }
 
-// ── OPEN MAPS MODAL ───────────────────────────────────────────
+// â”€â”€ OPEN MAPS MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function openMaps(d, ev){
   if(ev) ev.stopPropagation()
   if(typeof d==='string') try{d=JSON.parse(d)}catch(e){d={}}
@@ -1506,12 +1705,12 @@ function openMaps(d, ev){
   document.getElementById('mapsModal').classList.add('open')
 }
 
-// ── OPEN REVIEW DETAIL ────────────────────────────────────────
+// â”€â”€ OPEN REVIEW DETAIL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function openDetail(reviewId){
   const r = allReviews.find(x=>x.id===reviewId)
   if(!r) return
 
-  const stars='★'.repeat(r.rating)+'☆'.repeat(5-r.rating)
+  const stars='â˜…'.repeat(r.rating)+'â˜†'.repeat(5-r.rating)
   const date=new Date(r.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})
   const uname=r.profiles?.username||r.username||'anon'
   const tagMap={food:'tag-food',spot:'tag-spot',flat:'tag-flat',travel:'tag-travel'}
@@ -1534,11 +1733,7 @@ function openDetail(reviewId){
     const ds=JSON.stringify(d).replace(/"/g,'&quot;')
     locHtml=`<div class="detail-loc">
       <div class="detail-loc-text">${esc(r.location_name||'GPS Location')}</div>
-      <div class="detail-maps-btns">
-        <button class="detail-map-btn google open-maps-btn" data-ds="${esc(ds)}">Google</button>
-        <button class="detail-map-btn apple open-maps-btn" data-ds="${esc(ds)}">Apple</button>
-        
-      </div>
+      <button class="detail-map-btn open-maps-btn" data-ds="${esc(ds)}" style="width:auto;margin-top:.5rem">ðŸ“ Open in Maps</button>
     </div>`
   }
 
@@ -1551,7 +1746,7 @@ function openDetail(reviewId){
     }).join('')
     aggHtml=`<div class="detail-agg">
       <div class="detail-agg-title">Overall Rating (${agg.count} reviews)</div>
-      <div class="agg-summary"><div class="agg-big-score">${avg}</div><div class="agg-right"><div class="agg-stars-row">${'★'.repeat(Math.round(agg.total/agg.count))}${'☆'.repeat(5-Math.round(agg.total/agg.count))}</div><div class="agg-count">${agg.count} total reviews</div></div></div>
+      <div class="agg-summary"><div class="agg-big-score">${avg}</div><div class="agg-right"><div class="agg-stars-row">${'â˜…'.repeat(Math.round(agg.total/agg.count))}${'â˜†'.repeat(5-Math.round(agg.total/agg.count))}</div><div class="agg-count">${agg.count} total reviews</div></div></div>
       ${bars}
     </div>`
   }
@@ -1563,7 +1758,7 @@ function openDetail(reviewId){
       <button id="deleteBtn_${r.id}" onclick="confirmDelete('${r.id}')"
         style="background:transparent;border:1px solid rgba(255,61,139,.35);color:var(--neon-pink);font-family:'Familjen Grotesk',sans-serif;font-weight:700;font-size:.85rem;padding:.6rem 1.2rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.5rem"
         onmouseover="this.style.background='rgba(255,61,139,.1)'" onmouseout="this.style.background='transparent'">
-        🗑️ Delete my review
+        Delete my review
       </button>
     </div>` : ''
 
@@ -1588,7 +1783,7 @@ function openDetail(reviewId){
   document.getElementById('detailModal').classList.add('open')
 }
 
-// ── LOCATION SEARCH (Nominatim / OpenStreetMap - free) ────────
+// â”€â”€ LOCATION SEARCH (Nominatim / OpenStreetMap - free) â”€â”€â”€â”€â”€â”€â”€â”€
 let locSearchTimer = null
 async function searchLocation(query){
   const resultsEl = document.getElementById('locResults')
@@ -1605,7 +1800,7 @@ async function searchLocation(query){
       }
       resultsEl.innerHTML = data.map(p=>`
         <div class="loc-result loc-result-item" data-name="${esc(p.display_name)}" data-lat="${p.lat}" data-lng="${p.lon}">
-          <span class="loc-result-icon">📍</span>
+          <span class="loc-result-icon">ðŸ“</span>
           <span>${esc(p.display_name.split(',').slice(0,3).join(', '))}</span>
         </div>`).join('')
       resultsEl.style.display='block'
@@ -1621,7 +1816,7 @@ function selectLocation(name, lat, lng){
   const coordsEl=document.getElementById('locCoords')
   coordsEl.textContent=`${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`
   coordsEl.style.display='block'
-  showToast('Location selected! 📍','success')
+  showToast('Location selected! ðŸ“','success')
 }
 
 function checkGpsWarning() {
@@ -1641,7 +1836,7 @@ function switchLocTab(tab){
   document.getElementById('locCoords').style.display='none';
   checkGpsWarning();
 }
-// ── LOCATION DETECT ───────────────────────────────────────────
+// â”€â”€ LOCATION DETECT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function detectLocation(){
   const btn=document.querySelector('.loc-detect-btn')
   const coordsEl=document.getElementById('locCoords')
@@ -1652,36 +1847,36 @@ function detectLocation(){
     pos=>{
       currentLat=pos.coords.latitude
       currentLng=pos.coords.longitude
-      btn.textContent='✅ Got it!'
+      btn.textContent='âœ… Got it!'
       btn.disabled=false
       const gpsInput=document.getElementById('rLocationGps')
       if(gpsInput) gpsInput.value=`${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`
       coordsEl.textContent=`${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`
       coordsEl.style.display='block'
-      showToast('Location detected! 📍','success')
+      showToast('Location detected! ðŸ“','success')
     },
     err=>{
-      btn.textContent='📍 Detect'
+      btn.textContent='ðŸ“ Detect'
       btn.disabled=false
-      const msgs={1:'Location permission denied — allow in browser settings',2:'Position unavailable',3:'Request timed out'}
+      const msgs={1:'Location permission denied â€” allow in browser settings',2:'Position unavailable',3:'Request timed out'}
       showToast(msgs[err.code]||'Could not get location','error')
     },
     {timeout:10000,enableHighAccuracy:true}
   )
 }
-// ── DELETE REVIEW ─────────────────────────────────────────────
+// â”€â”€ DELETE REVIEW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function confirmDelete(reviewId){
   const btn = document.getElementById(`deleteBtn_${reviewId}`)
   if(!btn) return
   if(btn.dataset.confirming !== 'true'){
     btn.dataset.confirming = 'true'
-    btn.innerHTML = '⚠️ Tap again to confirm'
+    btn.innerHTML = 'âš ï¸ Tap again to confirm'
     btn.style.borderColor = 'var(--neon-yellow)'
     btn.style.color = 'var(--neon-yellow)'
     setTimeout(()=>{
       if(btn.dataset.confirming==='true'){
         btn.dataset.confirming='false'
-        btn.innerHTML='🗑️ Delete my review'
+        btn.innerHTML='Delete my review'
         btn.style.borderColor='rgba(255,61,139,.35)'
         btn.style.color='var(--neon-pink)'
       }
@@ -1697,9 +1892,9 @@ async function deleteReview(reviewId){
   const {error} = await db.from('reviews').delete().eq('id', reviewId).eq('user_id', currentUser.id)
   if(error){
     showToast('Delete failed: ' + error.message, 'error')
-    if(btn){ btn.disabled=false; btn.innerHTML='🗑️ Delete my review'; btn.dataset.confirming='false' }
+    if(btn){ btn.disabled=false; btn.innerHTML='Delete my review'; btn.dataset.confirming='false' }
   } else {
-    showToast('Review deleted 🗑️', 'success')
+    showToast('Review deleted ðŸ—‘ï¸', 'success')
     closeModal('detailModal')
     await loadReviews()
   }
@@ -1731,10 +1926,10 @@ function switchTab(tab){
   const desc = document.getElementById('authModalDesc');
   if(title && desc) {
     if(tab === 'login'){
-      title.textContent = 'Welcome Back 👋';
+      title.textContent = 'Welcome Back ðŸ‘‹';
       desc.textContent = 'Sign in to drop reviews and help your batch.';
     } else {
-      title.textContent = 'Join RandomReviews ✨';
+      title.textContent = 'Join RandomReviews âœ¨';
       desc.textContent = 'Create an account to start reviewing places around campus.';
     }
   }
@@ -1750,7 +1945,7 @@ function resetForm(){
   document.getElementById('locCoords').textContent=''
   document.getElementById('locResults').style.display='none'
   const detectBtn=document.querySelector('.loc-detect-btn')
-  if(detectBtn) detectBtn.textContent='📍 Detect'
+  if(detectBtn) detectBtn.textContent='ðŸ“ Detect'
   switchLocTab('search')
   currentRating=0
   currentLat=null
@@ -1768,7 +1963,7 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 // close modals on bg click
 document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}))
 
-// ── EVENT LISTENERS ─────────────────────────────────────────
+// â”€â”€ EVENT LISTENERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 document.getElementById('locResults').addEventListener('click', e => {
   const item = e.target.closest('.loc-result-item');
   if(item) {
@@ -1783,7 +1978,30 @@ document.addEventListener('click', e => {
   }
 });
 
-// ── BOOT ──────────────────────────────────────────────────────
+// â”€â”€ IMAGE COMPRESSION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function compressImage(file, maxWidth, quality) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      const canvas = document.createElement('canvas')
+      let w = img.naturalWidth, h = img.naturalHeight
+      if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth }
+      canvas.width = w; canvas.height = h
+      const ctx = canvas.getContext('2d')
+      ctx.drawImage(img, 0, 0, w, h)
+      canvas.toBlob(blob => {
+        if (!blob) { reject(new Error('compression failed')); return }
+        resolve(new File([blob], 'photo.jpg', { type: 'image/jpeg' }))
+      }, 'image/jpeg', quality)
+    }
+    img.onerror = reject
+    img.src = url
+  })
+}
+
+// â”€â”€ BOOT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 initAuth()
 loadReviews()
 </script>
@@ -1792,7 +2010,7 @@ loadReviews()
 function toggleMenu(btn) {
   const nav = document.querySelector('.nav-links');
   nav.classList.toggle('active');
-  btn.textContent = nav.classList.contains('active') ? '✕' : '☰';
+  btn.textContent = nav.classList.contains('active') ? 'âœ•' : 'â˜°';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1802,7 +2020,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (nav && nav.classList.contains('active')) {
         nav.classList.remove('active');
         const btn = document.querySelector('.hamburger');
-        if (btn) btn.textContent = '☰';
+        if (btn) btn.textContent = 'â˜°';
       }
     });
   });
