@@ -360,6 +360,9 @@ h1 .l3 { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4); }
 .r-card-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 1.25rem; margin-bottom: 0.6rem; line-height: 1.35; color: #fff; }
 .r-card-body { font-size: 1rem; color: rgba(255, 255, 255, 0.75); line-height: 1.65; margin-bottom: 1.5rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-weight: 400; flex: 1; }
 .r-card-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-top: auto; }
+.support-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--muted); padding: 0.4rem 0.8rem; border-radius: 100px; font-size: 0.8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; transition: all 0.2s; font-family: 'Plus Jakarta Sans', sans-serif; }
+.support-btn:hover { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2); }
+.support-btn.active { background: rgba(255,61,139,0.15); color: var(--neon-pink); border-color: rgba(255,61,139,0.3); }
 .r-card-author { font-size: 0.75rem; color: var(--muted); font-family: 'Space Mono', monospace; }
 .r-card-location { font-size: 0.8rem; color: var(--text); margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 500; }
 .state-box { text-align: center; padding: 5rem 2rem; color: var(--muted); font-weight: 500; font-size: 1rem; background: var(--surface); border-radius: 20px; border: 1px solid var(--border); backdrop-filter: var(--glass-blur); }
@@ -768,7 +771,44 @@ create policy "Enforce image limits" on storage.objects for insert to authentica
   bucket_id = 'review-images' and
   (storage.extension(name) in ('jpg', 'jpeg', 'png', 'webp')) and
   (coalesce((metadata->>'size')::int, 0) <= 5242880)
-);</pre>
+);
+
+-- SUPPORT FEATURE
+alter table reviews add column if not exists support_count int default 0;
+
+create table if not exists review_supports (
+  review_id uuid references reviews(id) on delete cascade,
+  user_id uuid references auth.users(id) on delete cascade,
+  created_at timestamptz default now(),
+  primary key (review_id, user_id)
+);
+
+alter table review_supports enable row level security;
+drop policy if exists "Public read supports" on review_supports;
+create policy "Public read supports" on review_supports for select using (true);
+drop policy if exists "Auth insert supports" on review_supports;
+create policy "Auth insert supports" on review_supports for insert with check (auth.uid() = user_id);
+drop policy if exists "Auth delete supports" on review_supports;
+create policy "Auth delete supports" on review_supports for delete using (auth.uid() = user_id);
+
+create or replace function toggle_support(p_review_id uuid, p_user_id uuid)
+returns int as $$
+declare
+  v_exists boolean;
+  v_new_count int;
+begin
+  select exists(select 1 from review_supports where review_id = p_review_id and user_id = p_user_id) into v_exists;
+  if v_exists then
+    delete from review_supports where review_id = p_review_id and user_id = p_user_id;
+    update reviews set support_count = support_count - 1 where id = p_review_id returning support_count into v_new_count;
+  else
+    insert into review_supports (review_id, user_id) values (p_review_id, p_user_id);
+    update reviews set support_count = support_count + 1 where id = p_review_id returning support_count into v_new_count;
+  end if;
+  return v_new_count;
+end;
+$$ language plpgsql security definer;
+</pre>
   <p>After running, refresh this page. This panel disappears once the table is working.</p>
 </div>
 
@@ -1189,7 +1229,7 @@ function renderReviews(){
       </div>`
     }
 
-    // Location + maps
+    // Location
     let locHtml=''
     if(r.location_name||r.lat){
       const pinIcon=`<svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`
@@ -1202,7 +1242,8 @@ function renderReviews(){
       </div>`
     }
 
-    return `<div class="r-card ${r.category} animate-in" onclick="openDetail('${r.id}')" style="cursor:pointer; animation-delay: ${delay}s;">${sampleBadge}${img}<div class="card-tag ${tagMap[r.category]}">${catLabel[r.category]}</div><div class="r-card-title">${esc(r.title)}</div><div class="r-card-body">${esc(r.body)}</div>${locHtml}${aggHtml}<div class="r-card-meta" style="margin-top:.75rem"><span class="stars">${stars}</span><span class="r-card-author">@${esc(uname)} · ${date}</span></div></div>`
+    const supportCount = r.support_count || 0;
+    return `<div class="r-card ${r.category} animate-in" onclick="openDetail('${r.id}')" style="cursor:pointer; animation-delay: ${delay}s;">${sampleBadge}${img}<div class="card-tag ${tagMap[r.category]}">${catLabel[r.category]}</div><div class="r-card-title">${esc(r.title)}</div><div class="r-card-body">${esc(r.body)}</div>${locHtml}${aggHtml}<div class="r-card-meta" style="margin-top:.75rem"><div style="display:flex;align-items:center;gap:0.75rem;"><span class="stars">${stars}</span><span class="r-card-author">@${esc(uname)} · ${date}</span></div><button class="support-btn" onclick="event.stopPropagation(); toggleSupport('${r.id}')" id="sup_${r.id}"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg> <span class="count">${supportCount}</span></button></div></div>`
   }).join('')
 }
 
@@ -1532,6 +1573,35 @@ function openMaps(d, ev){
   document.getElementById('mapsModal').classList.add('open')
 }
 
+// ── TOGGLE SUPPORT ────────────────────────────────────────────
+async function toggleSupport(reviewId) {
+  if (!currentUser) { openAuth(); return; }
+  const btn = document.getElementById(`sup_${reviewId}`);
+  if (!btn) return;
+  const countSpan = btn.querySelector('.count');
+  const isSupporting = btn.classList.contains('active');
+  
+  let currentCount = parseInt(countSpan.textContent) || 0;
+  if (isSupporting) {
+    btn.classList.remove('active');
+    countSpan.textContent = currentCount - 1;
+  } else {
+    btn.classList.add('active');
+    countSpan.textContent = currentCount + 1;
+  }
+
+  const { data, error } = await db.rpc('toggle_support', { p_review_id: reviewId, p_user_id: currentUser.id });
+  if (error) {
+    showToast('Failed to sync support', 'error');
+    if (isSupporting) { btn.classList.add('active'); countSpan.textContent = currentCount; }
+    else { btn.classList.remove('active'); countSpan.textContent = currentCount; }
+  } else {
+    const rev = allReviews.find(r => r.id === reviewId);
+    if (rev) rev.support_count = data;
+    countSpan.textContent = data;
+  }
+}
+
 // ── OPEN REVIEW DETAIL ────────────────────────────────────────
 function openDetail(reviewId){
   const r = allReviews.find(x=>x.id===reviewId)
@@ -1593,6 +1663,32 @@ function openDetail(reviewId){
       </button>
     </div>` : ''
 
+  // Related Reviews
+  const related = allReviews.filter(x => x.id !== r.id && x.title.trim().toLowerCase() === r.title.trim().toLowerCase());
+  let relatedHtml = '';
+  if (related.length > 0) {
+    const relatedCards = related.map(rel => {
+      const relStars = '★'.repeat(rel.rating)+'☆'.repeat(5-rel.rating);
+      const relUname = rel.profiles?.username || rel.username || 'anon';
+      const relDate = new Date(rel.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+      const relSupport = rel.support_count || 0;
+      return `<div style="background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:12px; padding:1rem; margin-top:0.75rem; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'" onclick="openDetail('${rel.id}')">
+        <div style="font-size:0.9rem; margin-bottom:0.5rem; color:var(--text);">${esc(rel.body)}</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem;">
+          <span style="color:var(--muted)">@${esc(relUname)} · ${relDate}</span>
+          <span style="color:var(--neon-pink); font-weight:600;">${relStars} &nbsp; <svg style="vertical-align:middle;margin-bottom:2px;" viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg> ${relSupport}</span>
+        </div>
+      </div>`;
+    }).join('');
+    
+    relatedHtml = `
+      <div style="margin-top:2rem; padding-top:1.5rem; border-top:1px solid var(--border);">
+        <div style="font-size:0.85rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); margin-bottom:1rem;">Other reviews for ${esc(r.title)}</div>
+        ${relatedCards}
+      </div>
+    `;
+  }
+
   document.getElementById('detailContent').innerHTML = `
     ${imgHtml}
     <div class="detail-body">
@@ -1609,6 +1705,7 @@ function openDetail(reviewId){
       ${locHtml}
       ${aggHtml}
       ${deleteHtml}
+      ${relatedHtml}
     </div>`
 
   document.getElementById('detailModal').classList.add('open')
