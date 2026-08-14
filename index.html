@@ -825,6 +825,7 @@ $$ language plpgsql security definer;
     <button class="cat-btn" data-cat="flat" onclick="filterCat('flat',this)"> Flats</button>
     <button class="cat-btn" data-cat="travel" onclick="filterCat('travel',this)"> Travel</button>
     <select id="sortSelect" class="sort-select" onchange="handleSortChange()">
+      <option value="trending">🔥 Trending</option>
       <option value="newest">Newest First</option>
       <option value="oldest">Oldest First</option>
       <option value="highest">Highest Rated</option>
@@ -1042,7 +1043,7 @@ const db = createClient(
 let currentUser = null
 let currentRating = 0
 let currentFilter = 'all';
-let currentSort = 'newest';
+let currentSort = 'trending';
 let allReviews = []
 let currentLat = null
 let currentLng = null
@@ -1175,6 +1176,16 @@ function renderReviews(){
   
   // Sort reviews
   list.sort((a,b)=>{
+    if(currentSort==='trending') {
+      const now = new Date();
+      const aAgeDays = (now - new Date(a.created_at)) / (1000 * 60 * 60 * 24);
+      const bAgeDays = (now - new Date(b.created_at)) / (1000 * 60 * 60 * 24);
+      
+      const aScore = (a.support_count || 0) * 5 - aAgeDays;
+      const bScore = (b.support_count || 0) * 5 - bAgeDays;
+      
+      return bScore - aScore;
+    }
     if(currentSort==='newest') return new Date(b.created_at) - new Date(a.created_at);
     if(currentSort==='oldest') return new Date(a.created_at) - new Date(b.created_at);
     if(currentSort==='highest') return b.rating - a.rating;
