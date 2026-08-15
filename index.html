@@ -336,20 +336,36 @@ h1 .l3 { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4); }
 }
 .cat-btn:hover { background: var(--surface-hover); color: #fff; }
 .cat-btn.active { background: #fff; color: #000; border-color: #fff; box-shadow: 0 4px 15px rgba(255,255,255,0.15); }
-.reviews-grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 1.25rem; padding-bottom: 1rem; scrollbar-width: none; }
+/* FEED STACK CAROUSEL */
+.reviews-grid { position: relative; width: 100%; min-height: 480px; }
 .reviews-grid::-webkit-scrollbar { display: none; }
-.reviews-grid .r-card { min-width: 300px; max-width: 85vw; scroll-snap-align: center; flex-shrink: 0; }
 .feed-carousel-wrapper { position: relative; width: 100%; }
-.feed-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(20, 20, 28, 0.7); border: 1px solid var(--border); color: #fff; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-.feed-arrow:hover { background: var(--neon-pink); border-color: var(--neon-pink); color: #fff; }
-.feed-arrow.left { left: 1rem; }
-.feed-arrow.right { right: 1rem; }
-@media (max-width: 768px) { .feed-arrow { display: none; } }
+.feed-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 20; background: rgba(20, 20, 28, 0.8); border: 1px solid var(--border); color: #fff; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+.feed-arrow:hover { background: var(--neon-pink); border-color: var(--neon-pink); }
+.feed-arrow.left { left: -22px; }
+.feed-arrow.right { right: -22px; }
+.stack-counter { text-align: center; margin-top: 1.5rem; font-size: 0.8rem; color: var(--muted); font-family: 'Space Mono', monospace; letter-spacing: 0.05em; }
 .r-card {
   background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
-  padding: 1.75rem; transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden;
-  backdrop-filter: var(--glass-blur); display: flex; flex-direction: column;
+  padding: 1.75rem; transition: all 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: absolute;
+  top: 0; left: 0; width: 100%; backdrop-filter: var(--glass-blur);
+  display: flex; flex-direction: column;
   cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  opacity: 0; pointer-events: none;
+  transform: translateX(52px) scale(0.86) translateY(24px);
+  will-change: transform, opacity;
+}
+.r-card.card-current {
+  opacity: 1; pointer-events: auto; z-index: 10;
+  transform: translateX(0) scale(1) translateY(0);
+}
+.r-card.card-next-1 {
+  opacity: 0.75; z-index: 9;
+  transform: translateX(18px) scale(0.95) translateY(10px);
+}
+.r-card.card-next-2 {
+  opacity: 0.45; z-index: 8;
+  transform: translateX(34px) scale(0.90) translateY(18px);
 }
 .r-card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
@@ -359,40 +375,31 @@ h1 .l3 { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4); }
 .r-card.spot::before { background: linear-gradient(90deg, #63d4ff, #2196f3); }
 .r-card.flat::before { background: linear-gradient(90deg, #ff7ab8, #e91e8c); }
 .r-card.travel::before { background: linear-gradient(90deg, #ffd166, #f4a261); }
-.r-card:hover { transform: translateY(-6px); border-color: var(--border-hover); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-.r-card:hover::before { opacity: 1; }
-.r-card img { width: calc(100% + 3.5rem); margin: -1.75rem -1.75rem 1.5rem -1.75rem; height: 180px; object-fit: cover; border-radius: 22px 22px 0 0; }
+.r-card.card-current:hover::before { opacity: 1; }
+.r-card img { width: calc(100% + 3.5rem); margin: -1.75rem -1.75rem 1.25rem -1.75rem; height: 160px; object-fit: cover; border-radius: 22px 22px 0 0; }
+@media (max-width: 768px) { .r-card img { height: 130px; } }
 
-.r-card-icon {
-  width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
-  margin-bottom: 1.25rem; font-size: 1.4rem; flex-shrink: 0;
-}
-.r-card.food .r-card-icon { background: rgba(255,158,122,0.12); border: 1px solid rgba(255,158,122,0.2); }
-.r-card.spot .r-card-icon { background: rgba(99,212,255,0.12); border: 1px solid rgba(99,212,255,0.2); }
-.r-card.flat .r-card-icon { background: rgba(255,122,184,0.12); border: 1px solid rgba(255,122,184,0.2); }
-.r-card.travel .r-card-icon { background: rgba(255,209,102,0.12); border: 1px solid rgba(255,209,102,0.2); }
+.r-card-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 1.1rem; margin-bottom: 0.5rem; line-height: 1.3; color: #fff; letter-spacing: -0.01em; }
+.r-card-body { font-size: 0.88rem; color: rgba(255,255,255,0.65); line-height: 1.65; margin-bottom: 1.1rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-weight: 400; flex: 1; }
 
-.r-card-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 1.15rem; margin-bottom: 0.6rem; line-height: 1.3; color: #fff; letter-spacing: -0.01em; }
-.r-card-body { font-size: 0.9rem; color: rgba(255,255,255,0.65); line-height: 1.7; margin-bottom: 1.25rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-weight: 400; flex: 1; }
-
-.r-card-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.25rem; }
+.r-card-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
 .r-card-chip {
   display: inline-flex; align-items: center; gap: 0.3rem;
   background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: rgba(255,255,255,0.7);
-  padding: 0.3rem 0.75rem; border-radius: 100px; font-size: 0.75rem; font-weight: 600;
+  padding: 0.25rem 0.7rem; border-radius: 100px; font-size: 0.72rem; font-weight: 600;
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
 .r-card-chip.stars-chip { background: rgba(255,209,102,0.1); border-color: rgba(255,209,102,0.25); color: #ffd166; }
-.r-card-chip.loc-chip { background: rgba(99,212,255,0.08); border-color: rgba(99,212,255,0.2); color: #63d4ff; }
+.r-card-chip.loc-chip { background: rgba(99,212,255,0.08); border-color: rgba(99,212,255,0.2); color: #63d4ff; font-size: 0.68rem; max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
 
-.r-card-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border); }
-.support-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--muted); padding: 0.4rem 0.9rem; border-radius: 100px; font-size: 0.8rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; transition: all 0.2s; font-family: 'Plus Jakarta Sans', sans-serif; }
+.r-card-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-top: auto; padding-top: 0.85rem; border-top: 1px solid var(--border); }
+.support-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--muted); padding: 0.35rem 0.85rem; border-radius: 100px; font-size: 0.78rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; transition: all 0.2s; font-family: 'Plus Jakarta Sans', sans-serif; }
 .support-btn:hover { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2); }
 .support-btn.active { background: rgba(255,61,139,0.15); color: var(--neon-pink); border-color: rgba(255,61,139,0.3); }
-.r-card-author { font-size: 0.72rem; color: var(--muted); font-family: 'Space Mono', monospace; }
+.r-card-author { font-size: 0.7rem; color: var(--muted); font-family: 'Space Mono', monospace; }
 .r-card-location { font-size: 0.8rem; color: var(--text); margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 500; }
 .state-box { text-align: center; padding: 5rem 2rem; color: var(--muted); font-weight: 500; font-size: 1rem; background: var(--surface); border-radius: 20px; border: 1px solid var(--border); backdrop-filter: var(--glass-blur); }
-.empty-state { grid-column: 1/-1; text-align: center; padding: 5rem 2rem; border: 1px dashed var(--border); border-radius: 20px; color: var(--muted); }
+.empty-state { text-align: center; padding: 5rem 2rem; border: 1px dashed var(--border); border-radius: 20px; color: var(--muted); position: absolute; width: 100%; top: 0; left: 0; }
 .empty-state .icon { font-size: 3.5rem; margin-bottom: 1.5rem; opacity: 0.5; }
 
 /* SQL PANEL */
@@ -858,17 +865,18 @@ $$ language plpgsql security definer;
       <option value="lowest">Lowest Rated</option>
     </select>
   </div>
-  <div class="feed-carousel-wrapper">
-    <button class="feed-arrow left" onclick="scrollFeed(-1)" aria-label="Previous">
-      <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M15 18l-6-6 6-6"/></svg>
+  <div class="feed-carousel-wrapper" style="padding: 0 28px;">
+    <button class="feed-arrow left" onclick="navigateStack(-1)" aria-label="Previous">
+      <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
     <div id="reviewsGrid" class="reviews-grid">
       <div class="state-box">Loading reviews...</div>
     </div>
-    <button class="feed-arrow right" onclick="scrollFeed(1)" aria-label="Next">
-      <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 18l6-6-6-6"/></svg>
+    <button class="feed-arrow right" onclick="navigateStack(1)" aria-label="Next">
+      <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M9 18l6-6-6-6"/></svg>
     </button>
   </div>
+  <div class="stack-counter" id="stackCounter"></div>
 </section>
 
 <!-- WEEKLY TOP CHARTS -->
@@ -1196,20 +1204,19 @@ async function loadReviews(){
   }
 }
 
+let currentCardIndex = 0;
+let currentRenderedList = [];
+
 function renderReviews(){
   const grid=document.getElementById('reviewsGrid')
   const list=currentFilter==='all'?allReviews:allReviews.filter(r=>r.category===currentFilter)
   
-  // Sort reviews
+  // Sort
   list.sort((a,b)=>{
     if(currentSort==='trending') {
       const now = new Date();
-      const aAgeDays = (now - new Date(a.created_at)) / (1000 * 60 * 60 * 24);
-      const bAgeDays = (now - new Date(b.created_at)) / (1000 * 60 * 60 * 24);
-      
-      const aScore = (a.support_count || 0) * 5 - aAgeDays;
-      const bScore = (b.support_count || 0) * 5 - bAgeDays;
-      
+      const aScore = (a.support_count || 0) * 5 - (now - new Date(a.created_at)) / (1000*60*60*24);
+      const bScore = (b.support_count || 0) * 5 - (now - new Date(b.created_at)) / (1000*60*60*24);
       return bScore - aScore;
     }
     if(currentSort==='newest') return new Date(b.created_at) - new Date(a.created_at);
@@ -1218,98 +1225,85 @@ function renderReviews(){
     if(currentSort==='lowest') return a.rating - b.rating;
   });
 
-  if(!list.length){
+  currentRenderedList = list;
+  currentCardIndex = 0;
 
+  if(!list.length){
+    grid.style.minHeight = '200px';
     grid.innerHTML=`<div class="empty-state"><div class="icon">🫥</div><p>No reviews here yet.<br>Be the first to drop one!</p></div>`
+    document.getElementById('stackCounter').textContent = '';
     return
   }
+
   const tagMap={food:'tag-food',spot:'tag-spot',flat:'tag-flat',travel:'tag-travel'}
   const catLabel={food:'Food',spot:'Spot',flat:'Flat',travel:'Travel'}
 
-  // Group all reviews by normalized title to compute aggregates
+  // Liked reviews from localStorage for current user
+  const likedSet = currentUser ? new Set(JSON.parse(localStorage.getItem(`liked_${currentUser.id}`) || '[]')) : new Set();
+
+  // Aggregate map
   const aggMap={}
   allReviews.forEach(r=>{
     const key=r.title.trim().toLowerCase()
-    if(!aggMap[key]) aggMap[key]={total:0,count:0,dist:{5:0,4:0,3:0,2:0,1:0}}
+    if(!aggMap[key]) aggMap[key]={total:0,count:0}
     aggMap[key].total+=r.rating
     aggMap[key].count++
-    aggMap[key].dist[r.rating]=(aggMap[key].dist[r.rating]||0)+1
   })
 
-  grid.innerHTML=list.map((r, idx)=>{
+  grid.innerHTML = list.map((r, idx) => {
     const sampleTitles = ["Saravana Bhavan Near Gate 3", "Terrace Behind C Block", "Sai Residency, Potheri"];
     const isSample = sampleTitles.includes(r.title);
-    const sampleBadge = isSample ? '<div style="position:absolute; top:1rem; right:1rem; background:rgba(0,0,0,0.5); color:var(--muted); font-size:0.6rem; font-weight:700; padding:0.25rem 0.5rem; border-radius:100px; border:1px solid var(--border); letter-spacing:0.05em; z-index:10; pointer-events:none; backdrop-filter:blur(4px);">SAMPLE</div>' : '';
-    const delay = (idx * 0.05).toFixed(2);
-    const stars='★'.repeat(r.rating)+'☆'.repeat(5-r.rating)
-    const img=r.image_url?`<img src="${esc(r.image_url)}" alt="photo" loading="lazy">`:'';
-    const date=new Date(r.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short'})
-    const uname=r.profiles?.username||r.username||'anon'
-
-    // Aggregate block — only show if 2+ reviews for this place
-    const agg=aggMap[r.title.trim().toLowerCase()]
-    let aggHtml=''
-    if(agg&&agg.count>=2){
-      const avg=(agg.total/agg.count).toFixed(1)
-      const avgStars='★'.repeat(Math.round(agg.total/agg.count))+'☆'.repeat(5-Math.round(agg.total/agg.count))
-      const bars=[5,4,3,2,1].map(n=>{
-        const pct=agg.count>0?Math.round((agg.dist[n]||0)/agg.count*100):0
-        return `<div class="bar-row"><span class="bar-label">${n}</span><div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div><span class="bar-num">${agg.dist[n]||0}</span></div>`
-      }).join('')
-      aggHtml=`<div class="agg-bar-wrap">
-        <div class="agg-summary">
-          <div class="agg-big-score">${avg}</div>
-          <div class="agg-right">
-            <div class="agg-stars-row">${avgStars}</div>
-            <div class="agg-count">${agg.count} reviews total</div>
-          </div>
-        </div>
-        ${bars}
-      </div>`
-    }
-
-    // Location
-    let locHtml=''
-    if(r.location_name||r.lat){
-      const pinIcon=`<svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`
-      const locText=r.location_name?esc(r.location_name):'Location attached'
-      const d={name:r.title,loc:r.location_name||'',lat:r.lat||null,lng:r.lng||null}
-      const ds=JSON.stringify(d).replace(/"/g,'&quot;')
-      locHtml=`<div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:.5rem">
-        <div class="r-card-location">${locText}</div>
-        <button class="maps-btn open-maps-btn" data-ds="${esc(ds)}">${pinIcon} Open in Maps</button>
-      </div>`
-    }
-
+    const sampleBadge = isSample ? '<div style="position:absolute;top:1rem;right:1rem;background:rgba(0,0,0,0.5);color:var(--muted);font-size:0.6rem;font-weight:700;padding:0.25rem 0.5rem;border-radius:100px;border:1px solid var(--border);letter-spacing:0.05em;z-index:10;pointer-events:none;">SAMPLE</div>' : '';
+    const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+    // Only show image if NOT a sample review (no placeholder images on mobile)
+    const img = (r.image_url && !isSample) ? `<img src="${esc(r.image_url)}" alt="photo" loading="lazy">` : '';
+    const date = new Date(r.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short'})
+    const uname = r.profiles?.username || r.username || 'anon';
     const supportCount = r.support_count || 0;
-    const catIcons = { food: '🍽️', spot: '📍', flat: '🏠', travel: '✈️' };
-    const catIcon = catIcons[r.category] || '📝';
-    const starsText = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+    const isLiked = likedSet.has(r.id);
 
-    // Build chips row: stars + location if present
-    let chipsHtml = `<div class="r-card-chips"><span class="r-card-chip stars-chip">${starsText}</span>`;
-    if (r.location_name) chipsHtml += `<span class="r-card-chip loc-chip">📍 ${esc(r.location_name)}</span>`;
-    if (r.lat && !r.location_name) chipsHtml += `<span class="r-card-chip loc-chip">📍 Location</span>`;
+    // Chips: stars + location
+    let chipsHtml = `<div class="r-card-chips"><span class="r-card-chip stars-chip">${stars}</span>`;
+    if (r.location_name) chipsHtml += `<span class="r-card-chip loc-chip">${esc(r.location_name)}</span>`;
     chipsHtml += '</div>';
 
-    // Maps button if location exists
-    let mapsBtn = '';
-    if (r.location_name || r.lat) {
-      const d = {name: r.title, loc: r.location_name||'', lat: r.lat||null, lng: r.lng||null};
-      const ds = JSON.stringify(d).replace(/"/g, '&quot;');
-      mapsBtn = `<button class="maps-btn open-maps-btn" data-ds="${esc(ds)}" style="margin-left:auto;" onclick="event.stopPropagation()">Open in Maps</button>`;
-    }
+    return `<div class="r-card ${r.category}" onclick="openDetail('${r.id}')">${sampleBadge}${img}<div class="card-tag ${tagMap[r.category]}">${catLabel[r.category]}</div><div class="r-card-title">${esc(r.title)}</div><div class="r-card-body">${esc(r.body)}</div>${chipsHtml}<div class="r-card-meta"><div style="display:flex;flex-direction:column;gap:0.1rem"><span class="r-card-author">@${esc(uname)}</span><span style="font-size:0.68rem;color:var(--muted)">${date}</span></div><button class="support-btn${isLiked?' active':''}" onclick="event.stopPropagation();toggleSupport('${r.id}')" id="sup_${r.id}"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg> <span class="count">${supportCount}</span></button></div></div>`;
+  }).join('');
 
-    return `<div class="r-card ${r.category} animate-in" onclick="openDetail('${r.id}')" style="animation-delay: ${delay}s;">${sampleBadge}${img}<div class="r-card-icon">${catIcon}</div><div class="r-card-title">${esc(r.title)}</div><div class="r-card-body">${esc(r.body)}</div>${aggHtml}${chipsHtml}<div class="r-card-meta"><div style="display:flex;flex-direction:column;gap:0.15rem;"><span class="r-card-author">@${esc(uname)}</span><span style="font-size:0.7rem;color:#aaa;">${date}</span></div><button class="support-btn" onclick="event.stopPropagation(); toggleSupport('${r.id}')" id="sup_${r.id}"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg> <span class="count">${supportCount}</span></button></div></div>`
-  }).join('')
+  updateStackPositions();
 }
 
-// ── SCROLL FEED ───────────────────────────────────────────────
-function scrollFeed(dir) {
+// ── STACK NAVIGATION ───────────────────────────────────────────
+function updateStackPositions() {
   const grid = document.getElementById('reviewsGrid');
-  if(!grid) return;
-  const cardWidth = 350 + 32; // card min-width + approx gap (2rem)
-  grid.scrollBy({ left: dir * cardWidth, behavior: 'smooth' });
+  const cards = grid.querySelectorAll('.r-card');
+  const total = cards.length;
+  if (!total) return;
+
+  let maxH = 0;
+  cards.forEach((card, i) => {
+    card.classList.remove('card-current', 'card-next-1', 'card-next-2');
+    const pos = i - currentCardIndex;
+    if (pos === 0) { card.classList.add('card-current'); maxH = Math.max(maxH, card.scrollHeight); }
+    else if (pos === 1) card.classList.add('card-next-1');
+    else if (pos === 2) card.classList.add('card-next-2');
+  });
+
+  // Set grid height to accommodate stack + peek offset
+  grid.style.minHeight = (maxH + 44) + 'px';
+
+  // Update counter
+  const counter = document.getElementById('stackCounter');
+  if (counter) counter.textContent = `${currentCardIndex + 1} / ${total}`;
+}
+
+function navigateStack(dir) {
+  const total = currentRenderedList.length;
+  if (!total) return;
+  const newIdx = currentCardIndex + dir;
+  if (newIdx < 0 || newIdx >= total) return;
+  currentCardIndex = newIdx;
+  updateStackPositions();
 }
 
 // ── TICKER ────────────────────────────────────────────────────
@@ -1638,24 +1632,40 @@ async function toggleSupport(reviewId) {
   const countSpan = btn.querySelector('.count');
   const rev = allReviews.find(r => r.id === reviewId);
 
-  // Optimistically increment in UI
-  const newCount = (parseInt(countSpan.textContent) || 0) + 1;
-  countSpan.textContent = newCount;
-  btn.classList.add('active');
+  // Load liked set from localStorage for this user
+  const likedKey = `liked_${currentUser.id}`;
+  const likedArr = JSON.parse(localStorage.getItem(likedKey) || '[]');
+  const likedSet = new Set(likedArr);
+  const alreadyLiked = likedSet.has(reviewId);
 
-  // Direct increment update — no RPC needed
-  const { error } = await db
-    .from('reviews')
-    .update({ support_count: newCount })
-    .eq('id', reviewId);
+  const currentCount = parseInt(countSpan.textContent) || 0;
 
-  if (error) {
-    // Rollback UI
-    countSpan.textContent = newCount - 1;
+  if (alreadyLiked) {
+    // Unlike
+    const newCount = Math.max(currentCount - 1, 0);
     btn.classList.remove('active');
-    showToast('Could not save like. Please try again.', 'error');
+    countSpan.textContent = newCount;
+    likedSet.delete(reviewId);
+    const { error } = await db.from('reviews').update({ support_count: newCount }).eq('id', reviewId);
+    if (error) {
+      btn.classList.add('active'); countSpan.textContent = currentCount;
+    } else {
+      localStorage.setItem(likedKey, JSON.stringify([...likedSet]));
+      if (rev) rev.support_count = newCount;
+    }
   } else {
-    if (rev) rev.support_count = newCount;
+    // Like
+    const newCount = currentCount + 1;
+    btn.classList.add('active');
+    countSpan.textContent = newCount;
+    likedSet.add(reviewId);
+    const { error } = await db.from('reviews').update({ support_count: newCount }).eq('id', reviewId);
+    if (error) {
+      btn.classList.remove('active'); countSpan.textContent = currentCount;
+    } else {
+      localStorage.setItem(likedKey, JSON.stringify([...likedSet]));
+      if (rev) rev.support_count = newCount;
+    }
   }
 }
 
