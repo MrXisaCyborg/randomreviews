@@ -1295,6 +1295,9 @@ function updateStackPositions() {
   // Update counter
   const counter = document.getElementById('stackCounter');
   if (counter) counter.textContent = `${currentCardIndex + 1} / ${total}`;
+
+  // Attach swipe gestures (no-op if already attached)
+  initSwipeGestures();
 }
 
 function navigateStack(dir) {
@@ -1304,6 +1307,32 @@ function navigateStack(dir) {
   if (newIdx < 0 || newIdx >= total) return;
   currentCardIndex = newIdx;
   updateStackPositions();
+}
+
+// ── TOUCH SWIPE SUPPORT ───────────────────────────────────────
+let swipeTouchStartX = null;
+let swipeTouchStartY = null;
+
+function initSwipeGestures() {
+  const grid = document.getElementById('reviewsGrid');
+  if (!grid || grid._swipeInit) return;
+  grid._swipeInit = true;
+
+  grid.addEventListener('touchstart', (e) => {
+    swipeTouchStartX = e.touches[0].clientX;
+    swipeTouchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  grid.addEventListener('touchend', (e) => {
+    if (swipeTouchStartX === null) return;
+    const dx = e.changedTouches[0].clientX - swipeTouchStartX;
+    const dy = e.changedTouches[0].clientY - swipeTouchStartY;
+    swipeTouchStartX = null;
+    swipeTouchStartY = null;
+    // Only trigger if horizontal swipe is more dominant than vertical
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+    navigateStack(dx < 0 ? 1 : -1); // swipe left = next, swipe right = prev
+  }, { passive: true });
 }
 
 // ── TICKER ────────────────────────────────────────────────────
