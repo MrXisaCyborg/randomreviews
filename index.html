@@ -1776,6 +1776,12 @@ async function toggleSupport(reviewId) {
 
   if (error) {
     console.error('Support toggle failed:', error);
+    if(error.message && (error.message.includes('function') || error.message.includes('not exist') || error.message.includes('find'))) {
+      showToast('⚠️ Likes feature needs setup — please run the SQL panel query at the bottom of the page!', 'error');
+      document.getElementById('sqlHelper').style.display = 'block';
+    } else {
+      showToast('Failed to save like: ' + error.message, 'error');
+    }
     // Revert optimistic
     if (!isLikedNow) btn.classList.add('active');
     else btn.classList.remove('active');
