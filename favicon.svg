@@ -1,6 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
-  <rect width="180" height="180" rx="40" fill="#0a0a0f"/>
-  <rect width="180" height="180" rx="40" fill="#f5e642" opacity="0.12"/>
-  <text x="50%" y="54%" font-size="100" text-anchor="middle" dominant-baseline="middle" font-family="serif">⭐</text>
-  <text x="50%" y="88%" font-size="28" text-anchor="middle" font-family="monospace" fill="#f5e642" font-weight="bold">RR</text>
+  <rect width="180" height="180" rx="40" fill="#060613"/>
+  <rect width="180" height="180" rx="40" fill="url(#grad)" opacity="0.25"/>
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF2D78"/>
+      <stop offset="100%" stop-color="#00D4F5"/>
+    </linearGradient>
+  </defs>
+  <text x="50%" y="52%" font-size="70" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-weight="900" fill="white">RR</text>
 </svg>

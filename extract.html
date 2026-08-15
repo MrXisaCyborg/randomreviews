@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <canvas id="c" width="180" height="180"></canvas>
+  <script>
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+      <rect width="180" height="180" rx="40" fill="#060613"/>
+      <rect width="180" height="180" rx="40" fill="url(#grad)" opacity="0.25"/>
+      <defs>
+        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#FF2D78"/>
+          <stop offset="100%" stop-color="#00D4F5"/>
+        </linearGradient>
+      </defs>
+      <text x="50%" y="52%" font-size="70" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-weight="900" fill="white">RR</text>
+    </svg>`;
+    const blob = new Blob([svg], {type: 'image/svg+xml;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      const ctx = document.getElementById('c').getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const b64 = document.getElementById('c').toDataURL('image/png').split(',')[1];
+      fetch('http://localhost:8081', { method: 'POST', body: b64, mode: 'no-cors' })
+        .then(() => document.body.innerHTML = 'Done');
+    };
+    img.src = url;
+  </script>
+</body>
+</html>
