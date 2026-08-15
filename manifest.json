@@ -1,0 +1,16 @@
+{
+  "name": "Random Reviews",
+  "short_name": "RandomReviews",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#060613",
+  "theme_color": "#060613",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ]
+}
