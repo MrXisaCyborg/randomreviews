@@ -431,13 +431,17 @@ h1 .l3 { color: rgba(255,255,255,0.15); -webkit-text-stroke: 0; }
   transform: translateX(34px) scale(0.90) translateY(18px);
 }
 .r-card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
-  border-radius: 24px 24px 0 0; opacity: 1;
+  content: ''; position: absolute; inset: -1px;
+  border-radius: 24px;
+  border: solid transparent; border-width: 4px 0 0 0;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  pointer-events: none;
 }
-.r-card.food::before { background: linear-gradient(90deg, #ff9e7a, #ff6b3d); }
-.r-card.spot::before { background: linear-gradient(90deg, #63d4ff, #2196f3); }
-.r-card.flat::before { background: linear-gradient(90deg, #ff7ab8, #e91e8c); }
-.r-card.travel::before { background: linear-gradient(90deg, #ffd166, #f4a261); }
+.r-card.food::before { background: linear-gradient(90deg, #ff9e7a, #ff6b3d) border-box; }
+.r-card.spot::before { background: linear-gradient(90deg, #63d4ff, #2196f3) border-box; }
+.r-card.flat::before { background: linear-gradient(90deg, #ff7ab8, #e91e8c) border-box; }
+.r-card.travel::before { background: linear-gradient(90deg, #ffd166, #f4a261) border-box; }
 .r-card img { width: calc(100% + 3.5rem); margin: -1.75rem -1.75rem 1.25rem -1.75rem; height: 160px; object-fit: cover; border-radius: 22px 22px 0 0; }
 @media (max-width: 768px) { .r-card img { height: 130px; } }
 
