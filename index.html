@@ -376,10 +376,10 @@ h1 .l3 { color: rgba(255,255,255,0.15); -webkit-text-stroke: 0; }
 }
 
 /* TICKER */
-.ticker-wrap { padding: 0.75rem 0; overflow: hidden; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: rgba(10,10,15,0.6); backdrop-filter: var(--glass-blur); }
-.ticker-label { text-align: center; font-family: 'Outfit', sans-serif; font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem; font-weight: 700; }
-.ticker-track { display: flex; gap: 1rem; width: max-content; animation: ticker 40s linear infinite; }
-@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.ticker-wrap { padding: 0.75rem 0; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: rgba(10,10,15,0.6); backdrop-filter: var(--glass-blur); }
+.ticker-wrap::-webkit-scrollbar { display: none; }
+.ticker-label { text-align: center; font-family: 'Outfit', sans-serif; font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem; font-weight: 700; padding: 0 1.5rem; }
+.ticker-track { display: flex; gap: 1rem; width: max-content; padding: 0 1.5rem; }
 .ti { font-size: 0.75rem; display: flex; gap: 0.5rem; align-items: center; color: #fff; font-weight: 500; background: rgba(255,255,255,0.05); padding: 0.4rem 0.8rem; border-radius: 100px; border: 1px solid rgba(255,255,255,0.05); }
 .ti-star { color: rgba(255,255,255,0.8); }
 .ti-name { color: var(--muted); font-size: 0.65rem; font-family: 'Space Mono', monospace; }
@@ -936,6 +936,9 @@ begin
   return v_new_count;
 end;
 $$ language plpgsql security definer;
+
+-- FIX SYNC ISSUE FOR LIKES
+update reviews r set support_count = coalesce((select count(*) from review_supports rs where rs.review_id = r.id), 0);
 </pre>
   <p>After running, refresh this page. This panel disappears once the table is working.</p>
 </div>
@@ -1758,36 +1761,33 @@ async function toggleSupport(reviewId) {
   const likedKey = `liked_${currentUser.id}`;
   const likedArr = JSON.parse(localStorage.getItem(likedKey) || '[]');
   const likedSet = new Set(likedArr);
-  const alreadyLiked = likedSet.has(reviewId);
+  const isLikedNow = !btn.classList.contains('active');
 
   const currentCount = parseInt(countSpan.textContent) || 0;
+  const newCount = isLikedNow ? currentCount + 1 : Math.max(currentCount - 1, 0);
 
-  if (alreadyLiked) {
-    // Unlike
-    const newCount = Math.max(currentCount - 1, 0);
-    btn.classList.remove('active');
-    countSpan.textContent = newCount;
-    likedSet.delete(reviewId);
-    const { error } = await db.from('reviews').update({ support_count: newCount }).eq('id', reviewId);
-    if (error) {
-      btn.classList.add('active'); countSpan.textContent = currentCount;
-    } else {
-      localStorage.setItem(likedKey, JSON.stringify([...likedSet]));
-      if (rev) rev.support_count = newCount;
-    }
-  } else {
-    // Like
-    const newCount = currentCount + 1;
-    btn.classList.add('active');
-    countSpan.textContent = newCount;
-    likedSet.add(reviewId);
-    const { error } = await db.from('reviews').update({ support_count: newCount }).eq('id', reviewId);
-    if (error) {
-      btn.classList.remove('active'); countSpan.textContent = currentCount;
-    } else {
-      localStorage.setItem(likedKey, JSON.stringify([...likedSet]));
-      if (rev) rev.support_count = newCount;
-    }
+  // Optimistic UI update
+  if (isLikedNow) btn.classList.add('active');
+  else btn.classList.remove('active');
+  countSpan.textContent = newCount;
+
+  // Sync with reliable backend function
+  const { data: serverCount, error } = await db.rpc('toggle_support', { p_review_id: reviewId, p_user_id: currentUser.id });
+
+  if (error) {
+    console.error('Support toggle failed:', error);
+    // Revert optimistic
+    if (!isLikedNow) btn.classList.add('active');
+    else btn.classList.remove('active');
+    countSpan.textContent = currentCount;
+  } else if (serverCount !== null) {
+    // Backend returned exact count
+    countSpan.textContent = serverCount;
+    if (rev) rev.support_count = serverCount;
+    
+    if (isLikedNow) likedSet.add(reviewId);
+    else likedSet.delete(reviewId);
+    localStorage.setItem(likedKey, JSON.stringify([...likedSet]));
   }
 }
 
