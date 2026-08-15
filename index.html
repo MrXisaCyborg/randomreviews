@@ -346,10 +346,10 @@ h1 .l3 { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4); }
 .feed-arrow.right { right: 1rem; }
 @media (max-width: 768px) { .feed-arrow { display: none; } }
 .r-card {
-  background: #ffffff; border: 1.5px solid #f0f0f0; border-radius: 24px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
   padding: 1.75rem; transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden;
-  display: flex; flex-direction: column; box-shadow: 0 2px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
-  cursor: pointer;
+  backdrop-filter: var(--glass-blur); display: flex; flex-direction: column;
+  cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 }
 .r-card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
@@ -359,38 +359,38 @@ h1 .l3 { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4); }
 .r-card.spot::before { background: linear-gradient(90deg, #63d4ff, #2196f3); }
 .r-card.flat::before { background: linear-gradient(90deg, #ff7ab8, #e91e8c); }
 .r-card.travel::before { background: linear-gradient(90deg, #ffd166, #f4a261); }
-.r-card:hover { transform: translateY(-6px); border-color: #e0e0e0; box-shadow: 0 16px 40px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06); }
+.r-card:hover { transform: translateY(-6px); border-color: var(--border-hover); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
 .r-card:hover::before { opacity: 1; }
 .r-card img { width: calc(100% + 3.5rem); margin: -1.75rem -1.75rem 1.5rem -1.75rem; height: 180px; object-fit: cover; border-radius: 22px 22px 0 0; }
 
 .r-card-icon {
-  width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
-  margin-bottom: 1.25rem; font-size: 1.5rem; flex-shrink: 0;
+  width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+  margin-bottom: 1.25rem; font-size: 1.4rem; flex-shrink: 0;
 }
-.r-card.food .r-card-icon { background: rgba(255,158,122,0.12); }
-.r-card.spot .r-card-icon { background: rgba(99,212,255,0.12); }
-.r-card.flat .r-card-icon { background: rgba(255,122,184,0.12); }
-.r-card.travel .r-card-icon { background: rgba(255,209,102,0.15); }
+.r-card.food .r-card-icon { background: rgba(255,158,122,0.12); border: 1px solid rgba(255,158,122,0.2); }
+.r-card.spot .r-card-icon { background: rgba(99,212,255,0.12); border: 1px solid rgba(99,212,255,0.2); }
+.r-card.flat .r-card-icon { background: rgba(255,122,184,0.12); border: 1px solid rgba(255,122,184,0.2); }
+.r-card.travel .r-card-icon { background: rgba(255,209,102,0.12); border: 1px solid rgba(255,209,102,0.2); }
 
-.r-card-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 1.15rem; margin-bottom: 0.6rem; line-height: 1.3; color: #111; letter-spacing: -0.01em; }
-.r-card-body { font-size: 0.9rem; color: #555; line-height: 1.7; margin-bottom: 1.25rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-weight: 400; flex: 1; }
+.r-card-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 1.15rem; margin-bottom: 0.6rem; line-height: 1.3; color: #fff; letter-spacing: -0.01em; }
+.r-card-body { font-size: 0.9rem; color: rgba(255,255,255,0.65); line-height: 1.7; margin-bottom: 1.25rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-weight: 400; flex: 1; }
 
 .r-card-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.25rem; }
 .r-card-chip {
   display: inline-flex; align-items: center; gap: 0.3rem;
-  background: #f5f5f5; border: 1px solid #ebebeb; color: #444;
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: rgba(255,255,255,0.7);
   padding: 0.3rem 0.75rem; border-radius: 100px; font-size: 0.75rem; font-weight: 600;
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
-.r-card-chip.stars-chip { background: #fff8e1; border-color: #ffe082; color: #b8860b; }
-.r-card-chip.loc-chip { background: #f0f7ff; border-color: #bbdefb; color: #1565c0; }
+.r-card-chip.stars-chip { background: rgba(255,209,102,0.1); border-color: rgba(255,209,102,0.25); color: #ffd166; }
+.r-card-chip.loc-chip { background: rgba(99,212,255,0.08); border-color: rgba(99,212,255,0.2); color: #63d4ff; }
 
-.r-card-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-top: auto; padding-top: 1rem; border-top: 1px solid #f0f0f0; }
-.support-btn { background: #f5f5f5; border: 1.5px solid #ebebeb; color: #555; padding: 0.4rem 0.9rem; border-radius: 100px; font-size: 0.8rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; transition: all 0.2s; font-family: 'Plus Jakarta Sans', sans-serif; }
-.support-btn:hover { background: #111; color: #fff; border-color: #111; }
-.support-btn.active { background: rgba(255,61,139,0.08); color: #e91e8c; border-color: rgba(255,61,139,0.25); }
-.r-card-author { font-size: 0.72rem; color: #888; font-family: 'Space Mono', monospace; }
-.r-card-location { font-size: 0.8rem; color: #555; margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 500; }
+.r-card-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border); }
+.support-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--muted); padding: 0.4rem 0.9rem; border-radius: 100px; font-size: 0.8rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; transition: all 0.2s; font-family: 'Plus Jakarta Sans', sans-serif; }
+.support-btn:hover { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2); }
+.support-btn.active { background: rgba(255,61,139,0.15); color: var(--neon-pink); border-color: rgba(255,61,139,0.3); }
+.r-card-author { font-size: 0.72rem; color: var(--muted); font-family: 'Space Mono', monospace; }
+.r-card-location { font-size: 0.8rem; color: var(--text); margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 500; }
 .state-box { text-align: center; padding: 5rem 2rem; color: var(--muted); font-weight: 500; font-size: 1rem; background: var(--surface); border-radius: 20px; border: 1px solid var(--border); backdrop-filter: var(--glass-blur); }
 .empty-state { grid-column: 1/-1; text-align: center; padding: 5rem 2rem; border: 1px dashed var(--border); border-radius: 20px; color: var(--muted); }
 .empty-state .icon { font-size: 3.5rem; margin-bottom: 1.5rem; opacity: 0.5; }
@@ -1636,26 +1636,26 @@ async function toggleSupport(reviewId) {
   const btn = document.getElementById(`sup_${reviewId}`);
   if (!btn) return;
   const countSpan = btn.querySelector('.count');
-  const isSupporting = btn.classList.contains('active');
-  
-  let currentCount = parseInt(countSpan.textContent) || 0;
-  if (isSupporting) {
-    btn.classList.remove('active');
-    countSpan.textContent = currentCount - 1;
-  } else {
-    btn.classList.add('active');
-    countSpan.textContent = currentCount + 1;
-  }
+  const rev = allReviews.find(r => r.id === reviewId);
 
-  const { data, error } = await db.rpc('toggle_support', { p_review_id: reviewId, p_user_id: currentUser.id });
+  // Optimistically increment in UI
+  const newCount = (parseInt(countSpan.textContent) || 0) + 1;
+  countSpan.textContent = newCount;
+  btn.classList.add('active');
+
+  // Direct increment update — no RPC needed
+  const { error } = await db
+    .from('reviews')
+    .update({ support_count: newCount })
+    .eq('id', reviewId);
+
   if (error) {
-    showToast('Failed to sync support', 'error');
-    if (isSupporting) { btn.classList.add('active'); countSpan.textContent = currentCount; }
-    else { btn.classList.remove('active'); countSpan.textContent = currentCount; }
+    // Rollback UI
+    countSpan.textContent = newCount - 1;
+    btn.classList.remove('active');
+    showToast('Could not save like. Please try again.', 'error');
   } else {
-    const rev = allReviews.find(r => r.id === reviewId);
-    if (rev) rev.support_count = data;
-    countSpan.textContent = data;
+    if (rev) rev.support_count = newCount;
   }
 }
 
