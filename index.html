@@ -442,8 +442,11 @@ h1 .l3 { color: rgba(255,255,255,0.15); -webkit-text-stroke: 0; }
 .r-card.spot::before { background: linear-gradient(90deg, #63d4ff, #2196f3) border-box; }
 .r-card.flat::before { background: linear-gradient(90deg, #ff7ab8, #e91e8c) border-box; }
 .r-card.travel::before { background: linear-gradient(90deg, #ffd166, #f4a261) border-box; }
-.r-card img { width: calc(100% + 3.5rem); margin: -1.75rem -1.75rem 1.25rem -1.75rem; height: 160px; object-fit: cover; border-radius: 22px 22px 0 0; }
-@media (max-width: 768px) { .r-card img { height: 130px; } }
+.r-card-img-wrap { position: relative; width: calc(100% + 3.5rem); margin: -1.75rem -1.75rem 1.25rem -1.75rem; border-radius: 22px 22px 0 0; overflow: hidden; background: rgba(255,255,255,0.02); }
+.r-card-img { width: 100%; height: 160px; object-fit: cover; display: block; }
+@media (max-width: 768px) { .r-card-img { height: 130px; } }
+.heart-anim { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 4rem; opacity: 0; pointer-events: none; z-index: 10; text-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+@keyframes heartPop { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 15% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; } 30% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 70% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; } }
 
 .r-card-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 1.1rem; margin-bottom: 0.5rem; line-height: 1.3; color: #fff; letter-spacing: -0.01em; }
 .r-card-body { font-size: 0.88rem; color: rgba(255,255,255,0.65); line-height: 1.65; margin-bottom: 1.1rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-weight: 400; flex: 1; }
@@ -1352,7 +1355,7 @@ function renderReviews(){
     const sampleBadge = isSample ? '<div style="position:absolute;top:1rem;right:1rem;background:rgba(0,0,0,0.5);color:var(--muted);font-size:0.6rem;font-weight:700;padding:0.25rem 0.5rem;border-radius:100px;border:1px solid var(--border);letter-spacing:0.05em;z-index:10;pointer-events:none;">SAMPLE</div>' : '';
     const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
     // Only show image if NOT a sample review (no placeholder images on mobile)
-    const img = (r.image_url && !isSample) ? `<img src="${esc(r.image_url)}" alt="photo" loading="lazy">` : '';
+    const img = (r.image_url && !isSample) ? `<div class="r-card-img-wrap" data-id="${r.id}" ondblclick="event.stopPropagation(); const anim=document.getElementById('ha_${r.id}'); if(anim){anim.style.animation='none';anim.offsetHeight;anim.style.animation='heartPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';} toggleSupport('${r.id}', true)"><img src="${esc(r.image_url)}" alt="photo" loading="lazy" class="r-card-img"><div class="heart-anim" id="ha_${r.id}">🤍</div></div>` : '';
     const date = new Date(r.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short'})
     const uname = r.profiles?.username || r.username || 'anon';
     const supportCount = r.support_count || 0;
@@ -1405,9 +1408,10 @@ function navigateStack(dir) {
   updateStackPositions();
 }
 
-// ── TOUCH SWIPE SUPPORT ───────────────────────────────────────
 let swipeTouchStartX = null;
 let swipeTouchStartY = null;
+
+let lastImageTap = 0;
 
 function initSwipeGestures() {
   const grid = document.getElementById('reviewsGrid');
@@ -1415,9 +1419,33 @@ function initSwipeGestures() {
   grid._swipeInit = true;
 
   grid.addEventListener('touchstart', (e) => {
+    // Check if tapping an image for double-tap-to-like
+    const imgWrap = e.target.closest('.r-card-img-wrap');
+    if (imgWrap) {
+      const now = new Date().getTime();
+      const timeSince = now - lastImageTap;
+      if (timeSince > 0 && timeSince < 350) {
+        // Double tap!
+        e.preventDefault();
+        e.stopPropagation();
+        const rid = imgWrap.dataset.id;
+        const anim = document.getElementById('ha_' + rid);
+        if (anim) {
+          anim.style.animation = 'none';
+          anim.offsetHeight; // trigger reflow
+          anim.style.animation = 'heartPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+        }
+        // Force like (true)
+        toggleSupport(rid, true);
+        lastImageTap = 0; // reset
+        return;
+      }
+      lastImageTap = now;
+    }
+
     swipeTouchStartX = e.touches[0].clientX;
     swipeTouchStartY = e.touches[0].clientY;
-  }, { passive: true });
+  }, { passive: false });
 
   grid.addEventListener('touchend', (e) => {
     if (swipeTouchStartX === null) return;
@@ -1750,7 +1778,7 @@ function openMaps(d, ev){
 }
 
 // ── TOGGLE SUPPORT ────────────────────────────────────────────
-async function toggleSupport(reviewId) {
+async function toggleSupport(reviewId, forceLike = false) {
   if (!currentUser) { openAuth(); return; }
   const btn = document.getElementById(`sup_${reviewId}`);
   if (!btn) return;
@@ -1761,7 +1789,11 @@ async function toggleSupport(reviewId) {
   const likedKey = `liked_${currentUser.id}`;
   const likedArr = JSON.parse(localStorage.getItem(likedKey) || '[]');
   const likedSet = new Set(likedArr);
-  const isLikedNow = !btn.classList.contains('active');
+  
+  // If forceLike is true (double tap) and we already like it, do nothing to db
+  if (forceLike && btn.classList.contains('active')) return;
+
+  const isLikedNow = forceLike ? true : !btn.classList.contains('active');
 
   const currentCount = parseInt(countSpan.textContent) || 0;
   const newCount = isLikedNow ? currentCount + 1 : Math.max(currentCount - 1, 0);
