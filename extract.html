@@ -21,8 +21,13 @@
       const ctx = document.getElementById('c').getContext('2d');
       ctx.drawImage(img, 0, 0);
       const b64 = document.getElementById('c').toDataURL('image/png').split(',')[1];
-      fetch('http://localhost:8081', { method: 'POST', body: b64, mode: 'no-cors' })
-        .then(() => document.body.innerHTML = 'Done');
+      fetch('http://127.0.0.1:8081', { 
+          method: 'POST', 
+          headers: {
+              'Content-Type': 'text/plain'
+          },
+          body: b64
+      }).then(() => document.body.innerHTML += '<br>Done');
     };
     img.src = url;
   </script>
